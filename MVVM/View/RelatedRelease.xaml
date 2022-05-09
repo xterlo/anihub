@@ -1,0 +1,54 @@
+﻿<UserControl x:Class="testWpf.MVVM.View.RelatedRelease"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:testWpf.MVVM.View"
+             xmlns:viewModel="clr-namespace:testWpf.MVVM.ViewModel" 
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+             d:DataContext="{d:DesignInstance Type=viewModel:RelatedReleaseModel}"
+             mc:Ignorable="d" 
+             d:DesignHeight="350" d:DesignWidth="200">
+
+    <Grid>
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="MouseDown">
+                <i:InvokeCommandAction Command="{Binding MouseClick}" />
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="8*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <Border
+        CornerRadius="10">
+
+            <Border.Background>
+            <ImageBrush ImageSource="{Binding imageSourceLink}"/>
+        </Border.Background>
+
+
+    </Border>
+        <Label
+            VerticalAlignment="Bottom"
+            Grid.Row="1"
+            FontSize="15"
+            FontFamily="Fonts/#Monolog"
+            FontWeight="Medium"
+            Content="{Binding title_ru}"
+            Foreground="#d6d5d9">
+
+        </Label>
+        <Label
+            VerticalAlignment="Top"
+            Grid.Row="2"
+            FontSize="15"
+            FontFamily="Fonts/#Monolog"
+            FontWeight="Medium"
+            Content="{Binding year}"
+            Foreground="#797699">
+        </Label>
+    </Grid>
+</UserControl>

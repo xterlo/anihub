@@ -1,0 +1,65 @@
+﻿<UserControl x:Class="testWpf.Dialogs.MediaViewer.MediaViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:testWpf.Dialogs.MediaViewer" xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             mc:Ignorable="d" 
+             Loaded="UserControl_Loaded" Focusable="True"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.InputBindings>
+        <KeyBinding Key="Esc" Command="{Binding MouseClick, Mode=OneTime}" CommandParameter="{Binding RelativeSource=
+            {RelativeSource Mode=FindAncestor,AncestorType=Window}}"/>
+        <KeyBinding Key="Right" Command="{Binding ScrollImage}" CommandParameter="Right"/>
+        <KeyBinding Key="Left" Command="{Binding ScrollImage}" CommandParameter="Left"/>
+    </UserControl.InputBindings>
+    <Grid>
+        <Grid
+        Width="{Binding RelativeSource={RelativeSource Self}, Path=Parent.ActualWidth}"
+        Height="{Binding RelativeSource={RelativeSource Self}, Path=Parent.ActualHeight}"
+        Background="Black"
+        Opacity=".5">
+        </Grid>
+
+        <Border
+            CornerRadius="10"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Height="403"
+            Width="720">
+            <Border.Background>
+                <ImageBrush Stretch="Fill" ImageSource="{Binding currentImage}"/>
+            </Border.Background>
+            
+        </Border>
+        <TextBlock 
+            Text="{Binding message}"
+            Foreground="White"/>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button
+                BorderThickness="0"
+                Cursor="Hand"
+                FocusVisualStyle="{x:Null}"
+                Background="#01FFFFFF"
+                Style="{StaticResource imagesControlButton}"
+                Command="{Binding ScrollImage}"
+                CommandParameter="Left"/>
+            
+            <Button
+                BorderThickness="0"
+                FocusVisualStyle="{x:Null}"
+                Cursor="Hand"
+                Background="#01FFFFFF"
+                Grid.Column="1"
+                Style="{StaticResource imagesControlButton}"
+                Command="{Binding ScrollImage}"
+                CommandParameter="Right"/>
+        </Grid>
+
+    </Grid>
+</UserControl>

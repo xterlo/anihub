@@ -1,0 +1,580 @@
+﻿<UserControl x:Class="testWpf.MVVM.View.ReleaseView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:testWpf.MVVM.View"
+             xmlns:viewMode="clr-namespace:testWpf.MVVM.ViewModel"
+             xmlns:core="clr-namespace:testWpf.Core" xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" d:DataContext="{d:DesignInstance Type=viewMode:ReleaseViewModel}"
+             mc:Ignorable="d" 
+             
+             d:DesignHeight="5000" d:DesignWidth="1080"
+             Background="#282645"
+             
+             >
+    <!--<UserControl.DataContext>
+       <viewMode:ReleaseViewModel/>
+    </UserControl.DataContext>-->
+    <Grid x:Name="grid">
+        <ScrollViewer VerticalScrollBarVisibility="Visible"
+          HorizontalScrollBarVisibility="Disabled">
+
+            <StackPanel>
+
+
+                <StackPanel Orientation="Horizontal"
+                            MinHeight="300"
+                            MaxHeight="1000"
+                            x:Name="firstBlockPreview"
+                            >
+                    <Canvas>
+                        <Rectangle 
+                                Canvas.Top="-130"
+                                Width="{Binding ActualWidth,ElementName=grid}"
+                                Height="{Binding RelativeSource={RelativeSource Self}, Path=Parent.ActualHeight}" Panel.ZIndex="1">
+                            <Rectangle.Fill>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <GradientStop Color="#00000000"/>
+                                    <GradientStop Color="#FF282645" Offset="0.92"/>
+                                </LinearGradientBrush>
+                            </Rectangle.Fill>
+                        </Rectangle>
+                        <Rectangle 
+                                Canvas.Top="-140"
+                                Width="{Binding ActualWidth,ElementName=grid}"
+                                Height="{Binding RelativeSource={RelativeSource Self}, Path=Parent.ActualHeight}">
+                            <Rectangle.Fill>
+                                <ImageBrush
+                                        x:Name="imageBackground"
+                                        Opacity="0.8"
+                                        Stretch="UniformToFill"
+                                        AlignmentY="Top" 
+                                        AlignmentX="Center"
+                                        ImageSource="{Binding ReleasePoster}">
+                                </ImageBrush>
+                            </Rectangle.Fill>
+                            <Rectangle.BitmapEffect>
+                                <BlurBitmapEffect Radius="15"/>
+                            </Rectangle.BitmapEffect>
+
+                        </Rectangle>
+                    </Canvas>
+                    <Grid
+                        Width="{Binding ActualWidth,ElementName=grid}"
+                        HorizontalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="0.1*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="1" 
+                          MaxHeight="800"
+                          MaxWidth="1460"       
+                          SizeChanged="ImageResize"
+                          x:Name="previewContent">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.5*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel 
+                        MinWidth="215"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center">
+                                <Border
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Width="300"
+                                Height="400"
+                                MinHeight="266"
+                                MinWidth="200"
+                            x:Name="borderImage"
+                            CornerRadius="30">
+                                    <Border.Background>
+                                        <ImageBrush 
+                                Stretch="UniformToFill"
+                                ImageSource="{Binding ReleasePoster}">
+                                        </ImageBrush>
+                                    </Border.Background>
+                                </Border>
+
+                                <Button
+                                    Background="Black"
+                                    Content="Смотреть"
+                        Height="50"
+                        MaxWidth="250"
+                        MinWidth="130"
+                        Margin="0,20,0,0"
+                        HorizontalAlignment="Stretch"
+                        
+                        FontSize="26"
+                        Foreground="#d6d5d9"
+                        Command="{Binding WatchButtonClickCommand}">
+                                </Button>
+                                <TextBox
+                                    Text="{Binding searchData,UpdateSourceTrigger=PropertyChanged}">
+                                    
+                                </TextBox>
+                                <Button
+                                    Background="Black"
+                                    Content="Совместный просмотр"
+                        Height="50"
+                        MaxWidth="250"
+                        MinWidth="130"
+                        Margin="0,20,0,0"
+                        HorizontalAlignment="Stretch"
+                        
+                        FontSize="20"
+                        Foreground="#d6d5d9"
+                        Command="{Binding TogetherButtonClickCommand}">
+                                </Button>
+                            </StackPanel>
+                            <StackPanel 
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        MaxWidth="1000" Grid.Column="1"
+                        Margin="0">
+                                <TextBlock
+                            
+                            x:Name="releaseName"
+                        Padding="25,0,25,0"
+                        FontSize="40"
+                        Foreground="#d6d5d9"
+                        FontWeight="Bold"
+                        FontFamily="/Fonts/#Monolog"
+                        Text="{Binding ReleaseName}"/>
+                                <TextBlock
+                                Padding="25,0,25,0"
+                            x:Name="releaseOriginalName"
+                        FontSize="23"
+                        Foreground="Gray"
+                        FontWeight="Medium"
+                        FontFamily="/Fonts/#Monolog"
+                        Text="{Binding ReleaseOriginalName}"/>
+                                <TextBlock
+                                
+                                Padding="25,0,25,0"
+                            x:Name="releaseDescription"
+                        FontSize="20"
+                        FontWeight="Medium"
+                        Foreground="#d6d5d9"
+                        FontFamily="/Fonts/#Monolog"
+                        TextWrapping="WrapWithOverflow"
+                        Text="{Binding ReleaseDescription}"
+                        LineStackingStrategy="BlockLineHeight"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <ComboBox
+                                        ItemsSource="{Binding comboboxVoicesData}"
+                                        SelectedItem="{Binding SelectedVoiceItem}"
+                                        x:Name="voicesComboBox"
+                                        Width="200">
+
+                                    </ComboBox>
+                                    <ComboBox 
+                                        ItemsSource="{Binding comboboxEpisodesData}"
+                                        SelectedItem="{Binding SelectedEpisodeItem}"
+                                        x:Name="seriesComboBox"
+                                        Width="50">
+
+                                    </ComboBox>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </StackPanel>
+                <ContentControl
+                    x:Name="viewerControlParent"
+                    x:FieldModifier="public"
+                    Margin="50"
+                    Content="{Binding pleerWindow}">
+                </ContentControl>
+                <StackPanel 
+                    Width="auto" Height="auto"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Left"
+                    Margin="0,90,0,0">
+                    <Grid
+                        Width="{Binding ActualWidth,ElementName=grid}"
+                        HorizontalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="0.1*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Связанные релизы"
+                               Grid.Column="1"
+                               HorizontalAlignment="Left"
+                               Foreground="#d6d5d9"
+                               FontFamily="/Fonts/#Monolog"
+                               FontWeight="SemiBold"
+                               FontSize="30"/>
+                    </Grid>
+                </StackPanel>
+                <StackPanel>
+                    <Grid
+                        Width="{Binding ActualWidth,ElementName=grid}"
+                        Background="Transparent"
+                        HorizontalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="0.1*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <ScrollViewer
+                            x:Name="ScrollViewerRelated"
+                            CanContentScroll="False"
+                            VerticalScrollBarVisibility="Disabled"
+                            HorizontalScrollBarVisibility="Hidden"
+                            Grid.Column="1" 
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left"
+                            Margin="0,30,0,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel
+                                    x:Name="showcaseRelatedReleases"
+                                    Grid.Column="1" Orientation="Horizontal">
+                                    <StackPanel.Resources>
+                                        <Style TargetType="{x:Type Grid}">
+                                            <Setter Property="Width" Value="200"></Setter>
+                                            <Setter Property="Height" Value="350"></Setter>
+                                            <Setter Property="Margin" Value="0,0,20,0"></Setter>
+                                        </Style>
+                                    </StackPanel.Resources>
+                                    <ItemsControl 
+                                        ItemsSource="{Binding relatedReleaseModel}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel
+                                                    Orientation="Horizontal"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <local:RelatedRelease/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Grid>
+                        </ScrollViewer>
+                        <Canvas
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Right"
+                            Height="auto"
+                            Width="auto">
+                            <Ellipse 
+                                x:Name="scrollToLeftButton"
+                                MouseDown="ScrollButtonLeft"
+                                Canvas.Left="80"
+                                Width="50" 
+                                Height="50"
+                                Fill="#fc2c5e"/>
+                        </Canvas>
+                        <Canvas
+                             Grid.Column="2"
+                             VerticalAlignment="Center"
+                             HorizontalAlignment="Left"
+                             Height="auto"
+                             Width="auto">
+                            <Ellipse 
+                                    x:Name="scrollToRightButton"
+                                    MouseDown="ScrollButtonRight"
+                                    Canvas.Left="-80"
+                                    Width="50" 
+                                    Height="50"
+                                    Fill="#fc2c5e"/>
+                        </Canvas>
+                    </Grid>
+                </StackPanel>
+                <StackPanel
+                      Width="auto" Height="auto"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Left"
+                      Margin="0,90,0,0">
+                    <Grid
+                        Width="{Binding ActualWidth,ElementName=grid}"
+                        HorizontalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="0.1*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock 
+                        Grid.Column="1"
+                                Text="Кадры"
+                               HorizontalAlignment="Left"
+                               Foreground="#d6d5d9"
+                               FontFamily="/Fonts/#Monolog"
+                               FontWeight="SemiBold"
+                               FontSize="30"/>
+                    </Grid>
+                </StackPanel>
+                <StackPanel>
+                    <Grid
+                        Width="{Binding ActualWidth,ElementName=grid}"
+                        HorizontalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="0.1*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <ScrollViewer 
+                        x:Name="scrollViewerFragment"
+                        CanContentScroll="True"
+                        IsEnabled="True"
+                    VerticalScrollBarVisibility="Disabled"
+                    HorizontalScrollBarVisibility="Hidden" 
+                    Grid.Column="1" 
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Left"
+                      Margin="-10,20,0,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" >
+                                    <StackPanel.Resources>
+                                        <Style TargetType="{x:Type Grid}">
+                                            <Setter Property="Panel.ZIndex" Value="-1"></Setter>
+                                            <Setter Property="Width" Value="500"></Setter>
+                                            <Setter Property="Height" Value="321"></Setter>
+                                            <Setter Property="Margin" Value="0,0,20,0"></Setter>
+                                        </Style>
+                                    </StackPanel.Resources>
+                                    <ItemsControl 
+                                        
+                                        ItemsSource="{Binding screenshotsViewModel}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel Orientation="Horizontal"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <local:ScreenshotsView/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+
+                            </Grid>
+
+                        </ScrollViewer>
+                        <Canvas 
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right"
+                        Panel.ZIndex="1"
+                        Height="auto"
+                        Width="auto">
+                            <Ellipse 
+                                x:Name="scrollToLeftButtonFragment"
+                                MouseDown="ScrollButtonLeftFragment" 
+                                Canvas.Left="80"
+                                Width="50"
+                                Height="50"
+                                Fill="Blue"/>
+                        </Canvas>
+                        <Canvas 
+                            Grid.Column="2"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left"
+                            Height="auto"
+                            Width="auto">
+                            <Ellipse 
+                            x:Name="scrollToRightButtonFragment"
+                            MouseDown="ScrollButtonRightFragment"
+                            Canvas.Left="-80"
+                            Width="50" 
+                            Height="50"
+                            Fill="#fc2c5e"/>
+                        </Canvas>
+                    </Grid>
+                </StackPanel>
+                <StackPanel 
+                      Width="auto" Height="auto"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Left"
+                      Margin="0,90,0,0">
+                    <Grid
+                        Width="{Binding ActualWidth,ElementName=grid}"
+                        HorizontalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="0.1*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock 
+                            Grid.Column="1"
+                            Text="Рейтинг"
+                                   HorizontalAlignment="Left"
+                               Foreground="#d6d5d9"
+                               FontFamily="/Fonts/#Monolog"
+                               FontWeight="SemiBold"
+                               FontSize="30"/>
+                    </Grid>
+
+                </StackPanel>
+                <Grid 
+                    Margin="0,20"
+                    Width="{Binding ActualWidth,ElementName=grid}"
+                    HorizontalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Border  
+                        
+                        Margin="0,0,20,0"
+                        Padding="20"
+                        HorizontalAlignment="Center"
+                        CornerRadius="30"
+
+                        Background="#211d38">
+                        <Grid >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Path
+                            HorizontalAlignment="Right"
+                            Data="{StaticResource starsvg}" 
+                                      Width="100" 
+                                      Height="90"
+                              Stretch="Fill">
+                                <Path.Fill>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0" MappingMode="RelativeToBoundingBox">
+                                        <GradientStop Color="#FFF33764" Offset="0.522"/>
+                                        <GradientStop Color="#FFE66987" Offset="0.954"/>
+                                    </LinearGradientBrush>
+                                </Path.Fill>
+                            </Path>
+                            <Label 
+                            FontSize="32"
+                            Content="{Binding grade}"
+                            Foreground="#242542" 
+                            HorizontalAlignment="Center" 
+                            VerticalAlignment="Center"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"/>
+                            <Grid 
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left"
+                            Margin="20,0,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Grid.Resources>
+                                    <Style TargetType="{x:Type Rectangle}">
+                                        <Setter Property="Height" Value="7"/>
+                                        <Setter Property="RadiusX" Value="5"/>
+                                        <Setter Property="RadiusY" Value="100"/>
+                                        <Setter Property="Fill">
+                                            <Setter.Value>
+                                                <LinearGradientBrush EndPoint="1,1" StartPoint="0,0">
+                                                    <GradientStop Color="#FFCACACA" Offset="0.688"/>
+                                                    <GradientStop Color="#FFFEFEFE" Offset="1"/>
+                                                </LinearGradientBrush>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="Grid.Column" Value="1"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="HorizontalAlignment" Value="Left"/>
+                                    </Style>
+                                    <Style TargetType="{x:Type Label}">
+                                        <Setter Property="Foreground" Value="White"/>
+                                        <Setter Property="Padding" Value="-10"/>
+                                        <Setter Property="Margin" Value="0,0,5,0"/>
+                                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                        <Setter Property="FontSize" Value="15"/>
+
+                                    </Style>
+                                </Grid.Resources>
+                                <Label Content="5"/>
+                                <Label Content="4" Grid.Row="1"/>
+                                <Label Content="3" Grid.Row="2"/>
+                                <Label Content="2" Grid.Row="3"/>
+                                <Label Content="1" Grid.Row="4"/>
+                                <Rectangle Width="{Binding vote5}"/>
+                                <Rectangle Width="{Binding vote4}"  Grid.Row="1"/>
+                                <Rectangle Width="{Binding vote3}" Grid.Row="2"/>
+                                <Rectangle Width="{Binding vote2}" Grid.Row="3"/>
+                                <Rectangle Width="{Binding vote1}" Grid.Row="4"/>
+                            </Grid>
+                        </Grid>
+
+                    </Border>
+                    <Grid Grid.Column="1">
+                        <Grid VerticalAlignment="Top"
+                              HorizontalAlignment="Left">
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Label 
+                                FontSize="32"
+                                Foreground="#7a7699"
+                                Margin="0,0,0,10"
+                                HorizontalAlignment="Center"
+                                Content="Оцените прямо сейчас"/>
+                            <Grid
+                                
+                                Grid.Row="1" >
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.Resources>
+                                    <Style TargetType="{x:Type Path}">
+
+                                        <Setter Property="Margin" Value="0,0,30,0"/>
+                                        <Setter Property="Stroke" Value="#7a7699"/>
+                                        <Setter Property="StrokeThickness" Value="3"/>
+                                        <Setter Property="Width" Value="50"/>
+                                        <Setter Property="Height" Value="50"/>
+                                        <Setter Property="Data" Value="{StaticResource starsvg}"/>
+                                        <Setter Property="Stretch" Value="Fill"/>
+                                    </Style>
+                                </Grid.Resources>
+                                <Path/>
+                                <Path Grid.Column="1"/>
+                                <Path Grid.Column="2"/>
+                                <Path Grid.Column="3"/>
+                                <Path Grid.Column="4"
+                                      Margin="0,0,0,0"/>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Grid>
+
+            </StackPanel>
+
+        </ScrollViewer>
+
+    </Grid>
+
+</UserControl>

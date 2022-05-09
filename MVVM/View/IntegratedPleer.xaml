@@ -1,0 +1,143 @@
+﻿<UserControl x:Class="testWpf.MVVM.View.IntegratedPleer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:testWpf.MVVM.View"
+             xmlns:uc="clr-namespace:Vlc.DotNet.Wpf;assembly=Vlc.DotNet.Wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+
+            <!--<uc:VlcControl 
+            Background="Black"
+            x:Name="VideoView" Panel.ZIndex="-1" SizeChanged="VideoNormalizer">-->
+            <Grid>
+                <ContentControl 
+                    Panel.ZIndex="-1"
+                    Name="ControlContainer">
+                </ContentControl>
+            <Button
+                    x:Name="nextEpisodeBut"
+                    Panel.ZIndex="100"
+                    Background="Green"
+                    Width="25" Height="20"
+                        Click="NextEpisode" 
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right">
+
+                </Button>
+                <Button
+                    x:Name="prevEpisodeBut"
+                    Panel.ZIndex="100"
+                    Background="Green"
+                    Width="25" Height="20"
+                        Click="PrevEpisode" 
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left">
+
+                </Button>
+                <Button
+                    x:Name="closeButton"
+                    Panel.ZIndex="10000"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Cursor="Hand"
+                    BorderThickness="0"
+                    Style="{StaticResource closeButtonPleer}"
+                    MinWidth="25"
+                    Width="25"
+                    Height="25">
+                </Button>
+                <Label
+                    x:Name="animeName"
+                    Content="Название тайтла"
+                       FontSize="40"
+                       FontFamily="/Fonts/#ARNOLD-BOLD"
+                       Foreground="WhiteSmoke"
+                       Padding="50"/>
+                <Grid
+                    MouseMove="hideControls"
+                    x:Name="controlsGrid"
+                    Margin="0,0,0,10"
+                    Background="#01FFFFFF"
+                    Style="{StaticResource PleerButtonsStyles}"
+                    VerticalAlignment="Bottom">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.5*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="20*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="0.5*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="1" Click="PlayButton_Click">
+                        <Path x:Name="playPauseToggle" 
+                              Data="{StaticResource pauseIcon}"/>
+                    </Button>
+                    <!--<Button Grid.Column="1">
+                        <Path  Data="{StaticResource playIcon}"/>
+                    </Button>-->
+                    <Label
+                        Grid.Column="2"
+                        Content="00:00"
+                        x:Name="timePassed"/>
+
+                    <Rectangle 
+                        MouseMove="progressVideoBarMove"
+                        Cursor="Hand"
+                        MouseDown="progressVideoBarClickPressed"
+                        x:Name="progressVideoBar"
+                        Grid.Column="3"
+                        Margin="0,2,0,0"
+                        Height="7"
+                        RadiusX="5"
+                        RadiusY="5">
+                    </Rectangle>
+                    <Canvas
+                        Grid.Column="3"
+                        MouseUp="progressVideoBarClickReleased"
+                        Margin="0,0,0,8"
+                        VerticalAlignment="Center">
+                        <Ellipse
+                            Cursor="Hand"
+                            x:Name="asddsa"
+                            Canvas.Left="0"                        
+                            Grid.Column="3"
+                            Height="10"
+                            Width="10"
+                            Fill="#fc2c5e" />
+                    </Canvas>
+                    <Label
+                        MinWidth="45"
+                        Grid.Column="4"
+                        Content="00:00"
+                        x:Name="timeTotal"/>
+                    <!--<Button Grid.Column="5">
+                        <Path Data="{StaticResource volumeLowIcon}"/>
+                    </Button>-->
+                    <Button Grid.Column="5">
+                        <Path Width="20" Data="{StaticResource volumeOffIcon}"/>
+                    </Button>
+                    <!--<Button Grid.Column="5">
+                        <Path Data="{StaticResource volumeBigIcon}"/>
+                    </Button>-->
+                    <Button Grid.Column="6">
+                        <Path Data="{StaticResource settingsIcon}"/>
+                    </Button>
+                    <!--<Button Grid.Column="7">
+                        <Path   Data="{StaticResource fullscreenExitIcon}"/>
+                    </Button>-->
+                    <Button Grid.Column="7" Click="WindowStateToggle" Cursor="Hand">
+                        <Path  Data="{StaticResource fullscreenIcon}"/>
+                    </Button>
+
+
+                </Grid>
+            </Grid>
+        
+    </Grid>
+</UserControl>
