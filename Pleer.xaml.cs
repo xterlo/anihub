@@ -274,7 +274,7 @@ namespace testWpf
             properties = new Properties(p);
             ChangeVideoLength();
             ChangeVideoTime();
-            moveCircleAndProgressbar();
+            SliderProgress.Value = VideoView.SourceProvider.MediaPlayer.Position;
             animeName.Content = TemplatePreferens.releaseInfo.GetTitleRu();
             properties.PropertyChanged += (s, e) =>
             {
@@ -306,7 +306,6 @@ namespace testWpf
                 }
 
             });
-            this.MouseMove += new MouseEventHandler(progressVideoBarMove);
             this.MouseMove += new MouseEventHandler(hideControls);
             this.MouseUp += new MouseButtonEventHandler(progressVideoBarClickReleased);
             this.KeyDown += new KeyEventHandler(ShortcutEvent);
@@ -362,7 +361,7 @@ namespace testWpf
                     ChangeVideoTime();
                     break;
                 case "winPos":
-                    moveCircleAndProgressbar();
+                    SliderProgress.Value = VideoView.SourceProvider.MediaPlayer.Position;
                     break;
                 case "videoLength":
                     ChangeVideoLength();
@@ -405,7 +404,7 @@ namespace testWpf
         {
             ChangeVideoLength();
             ChangeVideoTime();
-            moveCircleAndProgressbar();
+            SliderProgress.Value = VideoView.SourceProvider.MediaPlayer.Position;
         }
 
         public void StartVideo()
@@ -506,55 +505,19 @@ namespace testWpf
             VideoView.SourceProvider.MediaPlayer.Pause();
         }
 
-        private void progressVideoBarClickPressed(object sender, MouseButtonEventArgs e)
-        {
 
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                moveCircleAndProgressbar(e);
-            }
+        private void moveCircleAndProgressbar(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            VideoView.SourceProvider.MediaPlayer.Position = (float)(sender as Slider).Value;
+        }
+        private void startedSlider(object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e)
+        {
+            VideoView.SourceProvider.MediaPlayer.SetPause(true);
         }
 
-        private void progressVideoBarMove(object sender, MouseEventArgs e)
+        private void endedSlider(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
-            //Console.WriteLine(sender);
-            if (sender == progressVideoBar && e.LeftButton == MouseButtonState.Pressed)
-            {
-                VideoView.SourceProvider.MediaPlayer.SetPause(true);
-                moveCircleAndProgressbar(null, e);
-                isProgressBarActive = true;
-            }
-            else if (sender != progressVideoBar && isProgressBarActive)
-            {
-                moveCircleAndProgressbar(null, e);
-            }
-        }
-
-        private void moveCircleAndProgressbar(MouseButtonEventArgs e = null, MouseEventArgs ev = null)
-        {
-            float progress;
-
-            if (e != null)
-            {
-                progress = (float)(1 / (progressVideoBar.ActualWidth / e.GetPosition(progressVideoBar).X));
-                VideoView.SourceProvider.MediaPlayer.Position = progress;
-            }
-            else if (ev != null)
-            {
-                progress = (float)(1 / (progressVideoBar.ActualWidth / ev.GetPosition(progressVideoBar).X));
-                VideoView.SourceProvider.MediaPlayer.Position = progress;
-            }
-            else
-                progress = properties.winPos;
-            float pos = properties.winPos;
-
-            LinearGradientBrush LGB = new LinearGradientBrush();
-            LGB.StartPoint = new Point(0, 0);
-            LGB.EndPoint = new Point(1, 1);
-            LGB.GradientStops.Add(new GradientStop(Color.FromArgb(255, 252, 44, 94), pos));
-            LGB.GradientStops.Add(new GradientStop(Color.FromArgb(130, 214, 213, 217), pos));
-            progressVideoBar.Fill = LGB;
-            Canvas.SetLeft(asddsa, (progressVideoBar.ActualWidth * progress) - 5);
+            VideoView.SourceProvider.MediaPlayer.SetPause(false);
         }
 
         private void progressVideoBarClickReleased(object sender, MouseButtonEventArgs e)

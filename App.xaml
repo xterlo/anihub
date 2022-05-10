@@ -13,6 +13,7 @@
                 <ResourceDictionary Source="Theme/TextBoxTheme.xaml"/>
                 <ResourceDictionary Source="Theme/ButtonControlsTheme.xaml"/>
                 <ResourceDictionary Source="Theme/PlayerContolsStyles.xaml"/>
+                <ResourceDictionary Source="Theme/SliderTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <DataTemplate DataType="{x:Type viewModel:HomeViewModel}">
                 <view:HomeView/>

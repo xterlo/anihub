@@ -89,6 +89,7 @@ namespace testWpf.MVVM.View
             { "pause",false }
         };
         public bool isProgressBarActive = false;
+        public bool isProgressBarActiveClick = false;
 
 
         public class Properties : INotifyPropertyChanged
@@ -335,7 +336,7 @@ namespace testWpf.MVVM.View
             };
             this.MouseDown += new MouseButtonEventHandler(async (s, e) =>
             {
-                if (e.LeftButton == MouseButtonState.Pressed)
+                if (e.LeftButton == MouseButtonState.Pressed && s.GetType() != typeof(Rectangle))
                 {
                     await Task.Delay(150);
                     if (!isDoubleClicked)
@@ -349,9 +350,8 @@ namespace testWpf.MVVM.View
                 }
 
             });
-            this.MouseMove += new MouseEventHandler(progressVideoBarMove);
+            //this.MouseMove += new MouseEventHandler(progressVideoBarMove);
             this.MouseMove += new MouseEventHandler(hideControls);
-            this.MouseUp += new MouseButtonEventHandler(progressVideoBarClickReleased);
             this.KeyDown += new KeyEventHandler(ShortcutEvent);
             this.MouseDoubleClick += new MouseButtonEventHandler((s, e) =>
             {
@@ -424,7 +424,7 @@ namespace testWpf.MVVM.View
                         isNeedUpdateProperties["position"] = false;
                         VideoView.SourceProvider.MediaPlayer.Position = properties.winPos;
                     }
-                    moveCircleAndProgressbar();
+                    SliderProgress.Value = VideoView.SourceProvider.MediaPlayer.Position;
                     break;
                 case "videoLength":
                     DateTime now = new DateTime(properties.videoLength);
@@ -460,7 +460,7 @@ namespace testWpf.MVVM.View
             timePassed.Content = TimeSpan.FromMilliseconds(properties.winTime).ToString(@"mm\:ss");
             DateTime now = new DateTime(properties.videoLength);
             timeTotal.Content = TimeSpan.FromMilliseconds(properties.videoLength).ToString(@"mm\:ss");
-            moveCircleAndProgressbar();
+            //moveCircleAndProgressbar();
         }
 
         public void StartVideo(bool nextEpisod = false)
@@ -548,64 +548,16 @@ namespace testWpf.MVVM.View
             VideoView.SourceProvider.MediaPlayer.Pause();
         }
 
-        private void progressVideoBarClickPressed(object sender, MouseButtonEventArgs e)
+        private void moveCircleAndProgressbar(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
 
-            if (e.LeftButton == MouseButtonState.Pressed)
+            if (isProgressBarActive || (!isProgressBarActive && (((sender as Slider).IsMouseOver && Mouse.LeftButton == MouseButtonState.Pressed) && !isProgressBarActiveClick)))
             {
-                moveCircleAndProgressbar(e);
+                VideoView.SourceProvider.MediaPlayer.Position = (float)(sender as Slider).Value;
+                //isProgressBarActiveClick = true;
             }
-        }
 
-        private void progressVideoBarMove(object sender, MouseEventArgs e)
-        {
-            if (sender == progressVideoBar && e.LeftButton == MouseButtonState.Pressed)
-            {
-                VideoView.SourceProvider.MediaPlayer.SetPause(true);
-                moveCircleAndProgressbar(null, e);
-                isProgressBarActive = true;
-            }
-            else if (sender != progressVideoBar && isProgressBarActive)
-            {
-                moveCircleAndProgressbar(null, e);
-            }
-        }
-
-        private void moveCircleAndProgressbar(MouseButtonEventArgs e = null, MouseEventArgs ev = null)
-        {
-            float progress;
-
-            if (e != null)
-            {
-                progress = (float)(1 / (progressVideoBar.ActualWidth / e.GetPosition(progressVideoBar).X));
-                VideoView.SourceProvider.MediaPlayer.Position = progress;
-            }
-            else if (ev != null)
-            {
-                progress = (float)(1 / (progressVideoBar.ActualWidth / ev.GetPosition(progressVideoBar).X));
-                VideoView.SourceProvider.MediaPlayer.Position = progress;
-            }
-            else
-                progress = VideoView.SourceProvider.MediaPlayer.Position;
-            float pos = VideoView.SourceProvider.MediaPlayer.Position;
-
-            LinearGradientBrush LGB = new LinearGradientBrush();
-            LGB.StartPoint = new Point(0, 0);
-            LGB.EndPoint = new Point(1, 1);
-            LGB.GradientStops.Add(new GradientStop(Color.FromArgb(255, 252, 44, 94), pos));
-            LGB.GradientStops.Add(new GradientStop(Color.FromArgb(130, 214, 213, 217), pos));
-            progressVideoBar.Fill = LGB;
-            Canvas.SetLeft(asddsa, (progressVideoBar.ActualWidth * progress) - 5);
-
-        }
-
-        private void progressVideoBarClickReleased(object sender, MouseButtonEventArgs e)
-        {
-            if (VideoView.SourceProvider.MediaPlayer.State == Vlc.DotNet.Core.Interops.Signatures.MediaStates.Paused && isProgressBarActive)
-            {
-                VideoView.SourceProvider.MediaPlayer.SetPause(false);
-                isProgressBarActive = false;
-            }
+            
         }
 
         private async void togglePlay()
@@ -613,7 +565,8 @@ namespace testWpf.MVVM.View
             if (VideoView.SourceProvider.MediaPlayer.State == Vlc.DotNet.Core.Interops.Signatures.MediaStates.Playing)
             {
                 properties.isPause = true;
-                SocketManager.SetPause(properties);
+                if(properties.isShared)
+                    SocketManager.SetPause(properties);
                 VideoView.SourceProvider.MediaPlayer.SetPause(true);
                 CustomAnimation anim = new CustomAnimation(playPauseToggle);
                 await anim.SvgAnimation(anim.easeOut, 500, SvgsAnimation.SvgsAnimation.playPause, Color.FromArgb(255, 194, 194, 194), Color.FromArgb(255, 252, 90, 129));
@@ -623,7 +576,8 @@ namespace testWpf.MVVM.View
             else
             {
                 properties.isPause = false;
-                SocketManager.SetPause(properties);
+                if (properties.isShared)
+                    SocketManager.SetPause(properties);
                 VideoView.SourceProvider.MediaPlayer.SetPause(false);
                 CustomAnimation anim = new CustomAnimation(playPauseToggle);
                 await anim.SvgAnimation(anim.easeOut, 500, SvgsAnimation.SvgsAnimation.playPause, Color.FromArgb(255, 194, 194, 194), Color.FromArgb(255, 252, 90, 129), true);
@@ -648,6 +602,7 @@ namespace testWpf.MVVM.View
                     if (c is Button) (c as Button).Visibility = Visibility.Visible;
                     if (c is Canvas) (c as Canvas).Visibility = Visibility.Visible;
                     if (c is Rectangle) (c as Rectangle).Visibility = Visibility.Visible;
+                    if (c is Slider) (c as Slider).Visibility = Visibility.Visible;
                     this.Cursor = Cursors.Arrow;
                     animeName.Visibility = Visibility.Visible;
                 }
@@ -656,6 +611,7 @@ namespace testWpf.MVVM.View
                 closeButton.Visibility = Visibility.Visible;
                 ThreadControlsHidden?.Abort();
                 ThreadControlsHidden = new Thread(checkControls);
+                
                 ThreadControlsHidden.Start();
                 await Task.Delay(2000);
                 //bool check = await checkControls(isControlsHidden);
@@ -669,6 +625,7 @@ namespace testWpf.MVVM.View
                         if (c is Button) (c as Button).Visibility = Visibility.Hidden;
                         if (c is Canvas) (c as Canvas).Visibility = Visibility.Hidden;
                         if (c is Rectangle) (c as Rectangle).Visibility = Visibility.Hidden;
+                        if (c is Slider) (c as Slider).Visibility = Visibility.Visible;
                         this.Cursor = Cursors.None;
                     }
                     nextEpisodeBut.Visibility = Visibility.Hidden;
@@ -702,6 +659,18 @@ namespace testWpf.MVVM.View
             Console.WriteLine($"EPISODE:{properties.episode}, FIRSTEPISODE:{properties.firstEpisode} ");
             if (properties.episode - 1 >= properties.firstEpisode)
                 properties.episode--;
+        }
+
+        private void startedSlider(object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e)
+        {
+            isProgressBarActive = true;
+            VideoView.SourceProvider.MediaPlayer.SetPause(true);
+        }
+
+        private void endedSlider(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            isProgressBarActive = false;
+            VideoView.SourceProvider.MediaPlayer.SetPause(properties.isPause);
         }
     }
 }

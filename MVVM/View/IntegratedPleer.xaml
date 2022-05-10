@@ -57,6 +57,7 @@
                        Foreground="WhiteSmoke"
                        Padding="50"/>
                 <Grid
+                    Panel.ZIndex="1"
                     MouseMove="hideControls"
                     x:Name="controlsGrid"
                     Margin="0,0,0,10"
@@ -81,36 +82,25 @@
                     <!--<Button Grid.Column="1">
                         <Path  Data="{StaticResource playIcon}"/>
                     </Button>-->
-                    <Label
+                <Label
                         Grid.Column="2"
                         Content="00:00"
                         x:Name="timePassed"/>
-
-                    <Rectangle 
-                        MouseMove="progressVideoBarMove"
-                        Cursor="Hand"
-                        MouseDown="progressVideoBarClickPressed"
-                        x:Name="progressVideoBar"
-                        Grid.Column="3"
-                        Margin="0,2,0,0"
-                        Height="7"
-                        RadiusX="5"
-                        RadiusY="5">
-                    </Rectangle>
-                    <Canvas
-                        Grid.Column="3"
-                        MouseUp="progressVideoBarClickReleased"
-                        Margin="0,0,0,8"
-                        VerticalAlignment="Center">
-                        <Ellipse
-                            Cursor="Hand"
-                            x:Name="asddsa"
-                            Canvas.Left="0"                        
-                            Grid.Column="3"
-                            Height="10"
-                            Width="10"
-                            Fill="#fc2c5e" />
-                    </Canvas>
+                <Slider
+                    Grid.Column="3"
+                    x:Name="SliderProgress"
+                    Style="{StaticResource Horizontal_Slider}"
+                    Minimum="0"
+                    Maximum="1"
+                    ValueChanged="moveCircleAndProgressbar"
+                    IsMoveToPointEnabled="True"
+          
+                    Thumb.DragStarted="startedSlider"
+                    Thumb.DragCompleted="endedSlider"
+                    VerticalAlignment="Center"
+                    >
+                    
+                </Slider>
                     <Label
                         MinWidth="45"
                         Grid.Column="4"
