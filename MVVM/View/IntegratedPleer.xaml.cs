@@ -122,6 +122,7 @@ namespace testWpf.MVVM.View
                 this.isShared = prop.isShared;
                 this.isOwner = prop.isOwner;
                 this.episode = prop.episode;
+                this.lockPause = prop.lockPause;
             }
 
             public Properties(string url,string VID, string ep, string lastep, string firstep)
@@ -281,6 +282,18 @@ namespace testWpf.MVVM.View
 
             }
 
+            private bool _lockPause;
+            public bool lockPause
+            {
+                get { return _lockPause; }
+                set
+                {
+                    _lockPause = value;
+                    OnPropertyChanged(nameof(lockPause));
+                }
+
+            }
+
             public void updateValues(WatchingRoomModel.Properties prop)
             {
                 this.videoLength = prop.videoLength;
@@ -298,6 +311,16 @@ namespace testWpf.MVVM.View
                 isNeedUpdateProperties["position"] = true;
                 this.winPos = info.positionState;
                 this.isPause = info.pauseState;
+            }
+            public void LockPause(bool locked)
+            {
+                this.lockPause = locked;
+            }
+
+            public void updatePosition(float position)
+            {
+                this.winPos = position;
+                isNeedUpdateProperties["position"] = true;
             }
 
             public void updateUrlRoom(string room)
@@ -449,6 +472,18 @@ namespace testWpf.MVVM.View
                         }
                         //else SocketManager.SetPause(properties);
                     }
+                    CustomAnimation anim = new CustomAnimation(playPauseToggle);
+                    await anim.SvgAnimation(anim.easeOut, 500, SvgsAnimation.SvgsAnimation.playPause, Color.FromArgb(255, 194, 194, 194), Color.FromArgb(255, 252, 90, 129),!properties.isPause);
+                    break;
+                case "lockPause":
+                    if (properties.isShared)
+                    {
+                        if (properties.lockPause)
+                        {
+                            VideoView.SourceProvider.MediaPlayer.SetPause(true);
+                        }
+                        else VideoView.SourceProvider.MediaPlayer.SetPause(properties.isPause);
+                    }
                     break;
             }
 
@@ -554,7 +589,13 @@ namespace testWpf.MVVM.View
             if (isProgressBarActive || (!isProgressBarActive && (((sender as Slider).IsMouseOver && Mouse.LeftButton == MouseButtonState.Pressed) && !isProgressBarActiveClick)))
             {
                 VideoView.SourceProvider.MediaPlayer.Position = (float)(sender as Slider).Value;
+                if (properties.isShared)
+                {
+                    properties.lockPause = true;
+                    SocketManager.changeVideoTime((sender as Slider).Value);
+                }
                 //isProgressBarActiveClick = true;
+
             }
 
             
@@ -568,8 +609,8 @@ namespace testWpf.MVVM.View
                 if(properties.isShared)
                     SocketManager.SetPause(properties);
                 VideoView.SourceProvider.MediaPlayer.SetPause(true);
-                CustomAnimation anim = new CustomAnimation(playPauseToggle);
-                await anim.SvgAnimation(anim.easeOut, 500, SvgsAnimation.SvgsAnimation.playPause, Color.FromArgb(255, 194, 194, 194), Color.FromArgb(255, 252, 90, 129));
+                //CustomAnimation anim = new CustomAnimation(playPauseToggle);
+                //await anim.SvgAnimation(anim.easeOut, 500, SvgsAnimation.SvgsAnimation.playPause, Color.FromArgb(255, 194, 194, 194), Color.FromArgb(255, 252, 90, 129));
                 
                 
             }
@@ -579,8 +620,8 @@ namespace testWpf.MVVM.View
                 if (properties.isShared)
                     SocketManager.SetPause(properties);
                 VideoView.SourceProvider.MediaPlayer.SetPause(false);
-                CustomAnimation anim = new CustomAnimation(playPauseToggle);
-                await anim.SvgAnimation(anim.easeOut, 500, SvgsAnimation.SvgsAnimation.playPause, Color.FromArgb(255, 194, 194, 194), Color.FromArgb(255, 252, 90, 129), true);
+                //CustomAnimation anim = new CustomAnimation(playPauseToggle);
+                //await anim.SvgAnimation(anim.easeOut, 500, SvgsAnimation.SvgsAnimation.playPause, Color.FromArgb(255, 194, 194, 194), Color.FromArgb(255, 252, 90, 129), true);
                 
             }
         }
@@ -670,7 +711,13 @@ namespace testWpf.MVVM.View
         private void endedSlider(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
             isProgressBarActive = false;
+            if (properties.isShared)
+            {
+                properties.lockPause = true;
+                SocketManager.changeVideoTime((sender as Slider).Value);
+            }
             VideoView.SourceProvider.MediaPlayer.SetPause(properties.isPause);
+
         }
     }
 }

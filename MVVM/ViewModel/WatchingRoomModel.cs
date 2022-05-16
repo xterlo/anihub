@@ -136,6 +136,7 @@ namespace testWpf.MVVM.ViewModel
                 this.urlvideo = prop.urlvideo;
                 this.urlroom = prop.urlroom;
                 this.episode = prop.episode;
+                this.lockPause = false;
             }
 
             public Properties(string urlVideo, string voiceId, int episode, int firstEpisode, int lastEpisode, bool isOwner)
@@ -149,6 +150,7 @@ namespace testWpf.MVVM.ViewModel
                 this.isShared = true;
                 this.isOwner = isOwner;
                 this.episode = episode;
+                this.lockPause=false;
             }
 
             public event PropertyChangedEventHandler PropertyChanged;
@@ -291,9 +293,21 @@ namespace testWpf.MVVM.ViewModel
                 }
 
             }
-        
-    
-        private void OnPropertyChanged(string propertyName)
+
+            private bool _lockPause;
+            public bool lockPause
+            {
+                get { return _lockPause; }
+                set
+                {
+                    _lockPause = value;
+                    OnPropertyChanged(nameof(lockPause));
+                }
+
+            }
+
+
+            private void OnPropertyChanged(string propertyName)
             {
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             }
@@ -371,6 +385,16 @@ namespace testWpf.MVVM.ViewModel
                     break;
                 case SocketManager.eventType.setPause:
                     IntegratedPleer.properties.setPause(sender as SocketPauseInformation);
+                    break;
+                case SocketManager.eventType.setReady:
+                    IntegratedPleer.properties.LockPause(true);
+                    IntegratedPleer.properties.updatePosition(Convert.ToSingle(sender));
+                    SocketManager.ChangeReadyState();
+                    //IntegratedPleer.properties.setPause(sender as SocketPauseInformation);
+                    break;
+                case SocketManager.eventType.changeVideoTime:
+                    IntegratedPleer.properties.LockPause(false);
+                    //IntegratedPleer.properties.setPause(sender as SocketPauseInformation);
                     break;
 
             }

@@ -24,7 +24,9 @@ namespace testWpf.Core
             acceptRoomInfo,
             newUserConnected,
             setNewPleerProperties,
-            setPause
+            setPause,
+            setReady,
+            changeVideoTime
         }
         public static void CreateSocket(string roomUrl)
         {
@@ -67,10 +69,15 @@ namespace testWpf.Core
                 if(responseHandler != null)
                     responseHandler(response.GetValue<SocketRoomInfo>(), eventType.acceptRoomInfo);
             });
-            socket.On("text", response =>
+            socket.On("readyChangeVideoTime", response =>
             {
-                Console.WriteLine(response);
-                //textSocket = response.GetValue<string>();
+                if (responseHandler != null)
+                    responseHandler(response.GetValue<float>(), eventType.setReady);
+            });
+            socket.On("changeVideoPos", response =>
+            {
+                if (responseHandler != null)
+                    responseHandler(response.GetValue<bool>(), eventType.changeVideoTime);
             });
             socket.OnConnected += async (senderr, ee) =>
             {
@@ -80,6 +87,21 @@ namespace testWpf.Core
                     token = "token123"
                 });
             };
+        }
+
+        public async static void SocketLeaveRoom()
+        {
+            await socket.EmitAsync("leave");
+        }
+
+        public async static void ChangeReadyState()
+        {
+            await socket.EmitAsync("getReadyClient");
+        }
+
+        public async static void changeVideoTime(double prop)
+        {
+            await socket.EmitAsync("changeVideoTime", prop);
         }
 
         public async static void GetRoomInfo(string roomUrl)
