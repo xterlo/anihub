@@ -9,6 +9,7 @@ using testWpf.MVVM.View;
 using SocketIOClient;
 using testWpf.Core;
 using System.Threading;
+using System.Collections.ObjectModel;
 
 namespace testWpf.MVVM.ViewModel
 {
@@ -34,8 +35,7 @@ namespace testWpf.MVVM.ViewModel
         {
             this.clientSid = clientSid;
             this.voicesId = prop.voicesId;
-            this.lastEpisode = prop.lastEpisode;
-            this.firstEpisode = prop.firstEpisode;
+            this.episodes = prop.episodes;
             this.videoLength = prop.videoLength;
             this.winPos = prop.winPos;
             this.winTime = prop.winTime;
@@ -63,11 +63,8 @@ namespace testWpf.MVVM.ViewModel
         [JsonProperty("episode")]
         public int episode { get; set; }
 
-        [JsonProperty("lastEpisode")]
-        public int lastEpisode { get; set; }
-
-        [JsonProperty("firstEpisode")]
-        public int firstEpisode { get; set; }
+        [JsonProperty("episodes")]
+        public ObservableCollection<int> episodes { get; set; }
 
         [JsonProperty("urlvideo")]
         public string urlvideo { get; set; }
@@ -97,11 +94,8 @@ namespace testWpf.MVVM.ViewModel
         [JsonProperty("episode")]
         public int episode { get; set; }
 
-        [JsonProperty("lastEpisode")]
-        public int lastEpisode { get; set; }
-
-        [JsonProperty("firstEpisode")]
-        public int firstEpisode { get; set; }
+        [JsonProperty("episodes")]
+        public ObservableCollection<string> episodes { get; set; }
 
         [JsonProperty("urlvideo")]
         public string urlvideo { get; set; }
@@ -126,9 +120,11 @@ namespace testWpf.MVVM.ViewModel
         {
             public Properties(SocketPleerPropertiesGet prop)
             {
+                ObservableCollection<int> episodes_int = new ObservableCollection<int>();
                 this.voicesId = prop.voicesId;
-                this.lastEpisode = prop.lastEpisode;
-                this.firstEpisode = prop.firstEpisode;
+                foreach (var episode in prop.episodes)
+                    episodes_int.Add(int.Parse(episode));
+                this.episodes = episodes_int;
                 this.videoLength = prop.videoLength;
                 this.winPos = prop.winPos;
                 this.winTime = prop.winTime;
@@ -139,17 +135,19 @@ namespace testWpf.MVVM.ViewModel
                 this.lockPause = false;
             }
 
-            public Properties(string urlVideo, string voiceId, int episode, int firstEpisode, int lastEpisode, bool isOwner)
+            public Properties(string urlVideo, string voiceId, int ep,ObservableCollection<string> episodes, bool isOwner)
             {
+                ObservableCollection<int> episodes_int = new ObservableCollection<int>();
                 this.voicesId = voiceId;
-                this.lastEpisode = lastEpisode;
-                this.firstEpisode = firstEpisode;
+                foreach (var episode in episodes)
+                    episodes_int.Add(int.Parse(episode));
+                this.episodes = episodes_int;
                 this.videoLength = 0;
                 this.urlvideo = urlVideo;
                 this.urlroom = __roomLink;
                 this.isShared = true;
                 this.isOwner = isOwner;
-                this.episode = episode;
+                this.episode = ep;
                 this.lockPause=false;
             }
 
@@ -216,24 +214,13 @@ namespace testWpf.MVVM.ViewModel
 
             }
 
-            private int _lastEpisode;
-            public int lastEpisode
+            private ObservableCollection<int> _episodes;
+            public ObservableCollection<int> episodes
             {
-                get { return _lastEpisode; }
+                get { return _episodes; }
                 set
                 {
-                    _lastEpisode = value;
-                }
-
-            }
-
-            private int _firstEpisode;
-            public int firstEpisode
-            {
-                get { return _firstEpisode; }
-                set
-                {
-                    _firstEpisode = value;
+                    _episodes = value;
                 }
 
             }
@@ -364,7 +351,7 @@ namespace testWpf.MVVM.ViewModel
             SocketManager.responseHandler += responseHandler;
         }
 
-        private void responseHandler(object sender, SocketManager.eventType et)
+        private async void responseHandler(object sender, SocketManager.eventType et)
         {
             switch (et)
             {
@@ -372,8 +359,10 @@ namespace testWpf.MVVM.ViewModel
                     SocketManager.GetRoomInfo(roomLink);
                     break;
                 case SocketManager.eventType.acceptRoomInfo:
-                    roomInfo = sender as SocketRoomInfo; 
-                    if(properties is null)
+                    roomInfo = sender as SocketRoomInfo;
+                    ResponseHandler response = new ResponseHandler();
+                    await response.GetRelease(roomInfo.animeid.ToString()); 
+                    if (properties is null)
                         InitPleer();
                     break;
                 case SocketManager.eventType.newUserConnected:
@@ -396,6 +385,9 @@ namespace testWpf.MVVM.ViewModel
                     IntegratedPleer.properties.LockPause(false);
                     //IntegratedPleer.properties.setPause(sender as SocketPauseInformation);
                     break;
+                case SocketManager.eventType.changeEpisode:
+                    IntegratedPleer.properties.updateEpisode(Convert.ToInt32(sender));
+                    break;
 
             }
         }
@@ -404,7 +396,7 @@ namespace testWpf.MVVM.ViewModel
         {
             App.Current.Dispatcher.Invoke((System.Action)delegate
             {
-                properties = new Properties(roomInfo.urlvideo, roomInfo.voiceid.ToString(), roomInfo.seria, 1, 3, false);
+                properties = new Properties(roomInfo.urlvideo, roomInfo.voiceid.ToString(), roomInfo.seria, new ObservableCollection<string>() { "1", "2", "3" }, false);
                 pleerWindow = new IntegratedPleer(properties);
                 
                 //pleerWindow.StartVideo();

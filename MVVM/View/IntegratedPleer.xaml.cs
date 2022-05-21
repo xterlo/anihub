@@ -1,6 +1,7 @@
 ﻿using LibVLCSharp.Shared;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -76,6 +77,7 @@ namespace testWpf.MVVM.View
 
         public string videoUrl;
         private VlcControl VideoView;
+        public Pleer pleerWindow;
         public bool fullscreen = false;
         public bool isPlaying = false;
         public bool isDoubleClicked = false;
@@ -86,7 +88,8 @@ namespace testWpf.MVVM.View
         {
             { "position",false },
             { "time",false },
-            { "pause",false }
+            { "pause",false },
+            { "episode",false }
         };
         public bool isProgressBarActive = false;
         public bool isProgressBarActiveClick = false;
@@ -94,28 +97,12 @@ namespace testWpf.MVVM.View
 
         public class Properties : INotifyPropertyChanged
         {
-            public Properties(Pleer.Properties prop)
-            {
-                this.voicesId = prop.voicesId;
-                this.winPos = prop.winPos;
-                this.winTime = prop.winTime;
-                this.lastEpisode = prop.lastEpisode;
-                this.firstEpisode = prop.firstEpisode;
-                this.videoLength = prop.videoLength;
-                this.urlvideo = prop.urlvideo;
-                this.urlroom = prop.urlroom;
-                this.isShared = prop.isShared;
-                this.isOwner = prop.isOwner;
-                this.episode = prop.episode;
-            }
-
             public Properties(WatchingRoomModel.Properties prop)
             {
                 this.voicesId = prop.voicesId;
                 this.winPos = prop.winPos;
                 this.winTime = prop.winTime;
-                this.lastEpisode = prop.lastEpisode;
-                this.firstEpisode = prop.firstEpisode;
+                this.episodes = prop.episodes;
                 this.videoLength = prop.videoLength;
                 this.urlvideo = prop.urlvideo;
                 this.urlroom = prop.urlroom;
@@ -125,11 +112,13 @@ namespace testWpf.MVVM.View
                 this.lockPause = prop.lockPause;
             }
 
-            public Properties(string url,string VID, string ep, string lastep, string firstep)
+            public Properties(string url,string VID, string ep, ObservableCollection<string> episodes)
             {
+                ObservableCollection<int> episodes_int = new ObservableCollection<int>();
                 this.voicesId = VID;
-                this.lastEpisode = int.Parse(lastep);
-                this.firstEpisode = int.Parse(firstep);
+                foreach (var episode in episodes)
+                    episodes_int.Add(int.Parse(episode));
+                this.episodes = episodes_int;
                 this.urlvideo = url;
                 this.isShared = false;
                 episode = int.Parse(ep);
@@ -204,24 +193,13 @@ namespace testWpf.MVVM.View
 
             }
 
-            private int _lastEpisode;
-            public int lastEpisode
+            private ObservableCollection<int> _episodes;
+            public ObservableCollection<int> episodes
             {
-                get { return _lastEpisode; }
+                get { return _episodes; }
                 set
                 {
-                    _lastEpisode = value;
-                }
-
-            }
-
-            private int _firstEpisode;
-            public int firstEpisode
-            {
-                get { return _firstEpisode; }
-                set
-                {
-                    _firstEpisode = value;
+                    _episodes = value;
                 }
 
             }
@@ -327,17 +305,23 @@ namespace testWpf.MVVM.View
             {
                 this.urlroom = room;
             }
+
+            public void updateEpisode(int episode)
+            {
+                this.episode = episode;
+                isNeedUpdateProperties["episode"] = true;
+            }
         }
-        public IntegratedPleer(string url, string VID, string ep, string lastep, string firstep)
+        public IntegratedPleer(string url, string VID, string ep, ObservableCollection<string> episodes)
         {
-            properties = new Properties(url,VID,ep,lastep,firstep);
+            properties = new Properties(url,VID,ep, episodes);
             Initialization();
             DateTime now = new DateTime(properties.videoLength);
             timeTotal.Content = TimeSpan.FromMilliseconds(properties.videoLength).ToString(@"mm\:ss");
         }
-        public IntegratedPleer(Pleer.Properties prop)
+        public IntegratedPleer(Properties prop)
         {
-            properties = new Properties(prop);
+            properties = prop;
             Initialization();
         }
         public IntegratedPleer(WatchingRoomModel.Properties prop)
@@ -349,7 +333,7 @@ namespace testWpf.MVVM.View
         {
             InitializeComponent();
             initVideoView();
-            animeName.Content = TemplatePreferens.releaseInfo.GetTitleRu();
+            animeName.Content = TemplatePreferens.releaseInfo.GetTitleRu() + " ⚫ " + properties.episode.ToString();
             properties.PropertyChanged += (s, e) =>
             {
                 Dispatcher.BeginInvoke(new Action(delegate
@@ -389,6 +373,7 @@ namespace testWpf.MVVM.View
                 {
 
                     StartVideo();
+                    VideoView.SourceProvider.MediaPlayer.SetPause(true);
                     VideoView.SourceProvider.MediaPlayer.LengthChanged += (s, ev) =>
                     {
                         properties.videoLength = VideoView.SourceProvider.MediaPlayer.Length;
@@ -458,7 +443,7 @@ namespace testWpf.MVVM.View
                     {
                         ResponseHandler resp = new ResponseHandler();
                         string kodikUrl = await resp.GetSeriaLink(resp.getEpisodesUrl, TemplatePreferens.releaseInfo.GetId().ToString(), properties.voicesId, properties.episode.ToString());
-                        videoUrl = await resp.GetVideoUrl(kodikUrl);
+                        properties.urlvideo = await resp.GetVideoUrl(kodikUrl);
                         StartVideo(true);
                     }
                     break;
@@ -500,19 +485,33 @@ namespace testWpf.MVVM.View
 
         public void StartVideo(bool nextEpisod = false)
         {
+            Console.WriteLine("StartVideoStart");
             //VideoView  = _mediaPlayer;
-            if (TemplatePreferens.VideoView.SourceProvider.MediaPlayer == null || nextEpisod==true)
+            if (TemplatePreferens.VideoView.SourceProvider.MediaPlayer == null)
             {
-
                 var currentAssembly = Assembly.GetEntryAssembly();
                 var currentDirectory = new FileInfo(currentAssembly.Location).DirectoryName;
                 var libDirectory = new DirectoryInfo(System.IO.Path.Combine(currentDirectory, "libvlc", IntPtr.Size == 4 ? "win-x86" : "win-x64"));
                 VideoView.SourceProvider.CreatePlayer(libDirectory);
                 var media = new Uri(properties.urlvideo);
                 VideoView.SourceProvider.MediaPlayer.Play(media);
-                VideoView.SourceProvider.MediaPlayer.Audio.Volume = 20;
+                VideoView.SourceProvider.MediaPlayer.Audio.Volume= 20;
+                
 
             }
+            if (nextEpisod && !isNeedUpdateProperties["episode"])
+            {
+                if (properties.isShared)
+                    SocketManager.ChangeEpisode(properties.episode);
+                VideoView.SourceProvider.MediaPlayer.Play(new Uri(properties.urlvideo));
+
+            }
+            else if (nextEpisod && isNeedUpdateProperties["episode"])
+            {
+                VideoView.SourceProvider.MediaPlayer.Play(new Uri(properties.urlvideo));
+                isNeedUpdateProperties["episode"] = false;
+            }
+
             //_mediaPlayer.Volume = 30;
 
 
@@ -573,9 +572,23 @@ namespace testWpf.MVVM.View
 
         private void WindowStateToggle(object sender = null, RoutedEventArgs e = null)
         {
-            TemplatePreferens.VideoView = VideoView;
-            var p = new Pleer(videoUrl, properties);
-            p.Show();
+            if (!fullscreen)
+            {
+                fullscreen = true;
+                TemplatePreferens.VideoView = VideoView;
+                pleerWindow = new Pleer(this);
+                pleerWindow.Show();
+
+            }
+            else
+            {
+                pleerWindow?.Close();
+                fullscreen = false;
+                if (properties.isShared)
+                    WatchingRoomModel.Instance.pleerWindow = new IntegratedPleer(properties);
+                else
+                    ReleaseViewModel.Instance.pleerWindow = new IntegratedPleer(properties);
+            }
         }
 
         private void ForwardButton_Click(object sender, RoutedEventArgs e)
@@ -589,18 +602,32 @@ namespace testWpf.MVVM.View
             if (isProgressBarActive || (!isProgressBarActive && (((sender as Slider).IsMouseOver && Mouse.LeftButton == MouseButtonState.Pressed) && !isProgressBarActiveClick)))
             {
                 VideoView.SourceProvider.MediaPlayer.Position = (float)(sender as Slider).Value;
-                if (properties.isShared)
-                {
-                    properties.lockPause = true;
+                if(properties.isShared)
                     SocketManager.changeVideoTime((sender as Slider).Value);
-                }
-                //isProgressBarActiveClick = true;
-
+                isProgressBarActive = false;
             }
-
-            
+        }
+        private void startedSlider(object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e)
+        {
+            isProgressBarActive = false;
+            isProgressBarActiveClick = true;
+            VideoView.SourceProvider.MediaPlayer.SetPause(true);
         }
 
+        private void endedSlider(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+
+            if (properties.isShared)
+            {
+                properties.lockPause = true;
+                SocketManager.changeVideoTime((sender as Slider).Value);
+            }
+            VideoView.SourceProvider.MediaPlayer.Position = (float)(sender as Slider).Value;
+            isProgressBarActive = true;
+            isProgressBarActiveClick = false;
+            VideoView.SourceProvider.MediaPlayer.SetPause(properties.isPause);
+
+        }
         private async void togglePlay()
         {
             if (VideoView.SourceProvider.MediaPlayer.State == Vlc.DotNet.Core.Interops.Signatures.MediaStates.Playing)
@@ -689,35 +716,25 @@ namespace testWpf.MVVM.View
 
         private void NextEpisode(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine($"EPISODE:{properties.episode}, LastEpisode:{properties.lastEpisode} ");
-            if (properties.episode + 1 <= properties.lastEpisode)
+            Console.WriteLine($"EPISODE:{properties.episode}, LastEpisode:{properties.episodes.Last()} ");
+            if (properties.episode + 1 <= properties.episodes.Last())
                 properties.episode++;
 
         }
 
         private void PrevEpisode(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine($"EPISODE:{properties.episode}, FIRSTEPISODE:{properties.firstEpisode} ");
-            if (properties.episode - 1 >= properties.firstEpisode)
+            Console.WriteLine($"EPISODE:{properties.episode}, FIRSTEPISODE:{properties.episodes.First()} ");
+            if (properties.episode - 1 >= properties.episodes.First())
                 properties.episode--;
         }
 
-        private void startedSlider(object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e)
-        {
-            isProgressBarActive = true;
-            VideoView.SourceProvider.MediaPlayer.SetPause(true);
-        }
 
-        private void endedSlider(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
-        {
-            isProgressBarActive = false;
-            if (properties.isShared)
-            {
-                properties.lockPause = true;
-                SocketManager.changeVideoTime((sender as Slider).Value);
-            }
-            VideoView.SourceProvider.MediaPlayer.SetPause(properties.isPause);
 
+        private void soundSliderChange(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            VideoView.SourceProvider.MediaPlayer.Audio.Volume = (int)(sender as Slider).Value;
+            Console.WriteLine((int)(sender as Slider).Value);
         }
     }
 }

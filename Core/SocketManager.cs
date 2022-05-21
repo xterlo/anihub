@@ -26,7 +26,8 @@ namespace testWpf.Core
             setNewPleerProperties,
             setPause,
             setReady,
-            changeVideoTime
+            changeVideoTime,
+            changeEpisode
         }
         public static void CreateSocket(string roomUrl)
         {
@@ -78,6 +79,11 @@ namespace testWpf.Core
             {
                 if (responseHandler != null)
                     responseHandler(response.GetValue<bool>(), eventType.changeVideoTime);
+            });
+            socket.On("changeEpisodeClient", response =>
+            {
+                if (responseHandler != null)
+                    responseHandler(response.GetValue<int>(), eventType.changeEpisode);
             });
             socket.OnConnected += async (senderr, ee) =>
             {
@@ -135,6 +141,11 @@ namespace testWpf.Core
         {
 
             await socket.EmitAsync("sendProperties", prop);
+        }
+        public async static void ChangeEpisode(int episode)
+        {
+
+            await socket.EmitAsync("changeEpisode", episode);
         }
 
     }

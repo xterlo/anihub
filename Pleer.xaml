@@ -11,25 +11,27 @@
         Title="MainWindow" 
         ResizeMode="NoResize" 
         WindowState="Maximized"
-        
+        Background="Black"
         BorderThickness="0">
     <Grid  MouseLeave="ResetCursor">
-        <Rectangle x:Name="ResizeN" Fill="Yellow" VerticalAlignment="Top"
+        <Rectangle x:Name="ResizeN" Fill="Black" VerticalAlignment="Top"
                    Height="10" Margin="9,-2,9,0" MouseEnter="DisplayResizeCursor"
                    MouseLeave="ResetCursor" PreviewMouseLeftButtonDown="Resize" />
-        <Rectangle x:Name="ResizeE" Fill="Yellow" HorizontalAlignment="Right"
+        <Rectangle x:Name="ResizeE" Fill="Black" HorizontalAlignment="Right"
                    Cursor="SizeWE"    
                    Width="10" Margin="0,9,-2,9" MouseEnter="DisplayResizeCursor"
                    MouseLeave="ResetCursor" PreviewMouseLeftButtonDown="Resize" />
-        <Rectangle x:Name="ResizeS" Fill="Yellow" VerticalAlignment="Bottom"
+        <Rectangle x:Name="ResizeS" Fill="Black" VerticalAlignment="Bottom"
                    Height="10" Margin="9,0,9,-2" MouseEnter="DisplayResizeCursor"
                    MouseLeave="ResetCursor" PreviewMouseLeftButtonDown="Resize" />
-        <Rectangle x:Name="ResizeW" Fill="Yellow" HorizontalAlignment="Left"
+        <Rectangle x:Name="ResizeW" Fill="Black" HorizontalAlignment="Left"
                    Width="10" Margin="-2,9,0,9"
                    Cursor="SizeWE"
                    MouseEnter="DisplayResizeCursor"
                    MouseLeave="ResetCursor" PreviewMouseLeftButtonDown="Resize" />
         <ContentControl
+            x:Name="PleerContainer"></ContentControl>
+        <!--<ContentControl
             Background="Black"
             x:Name="ControlContainer" Panel.ZIndex="-1" SizeChanged="VideoNormalizer">
         </ContentControl>
@@ -96,9 +98,9 @@
                         <Path x:Name="playPauseToggle" 
                               Data="{StaticResource pauseIcon}"/>
                     </Button>
-                    <!--<Button Grid.Column="1">
+                    --><!--<Button Grid.Column="1">
                         <Path  Data="{StaticResource playIcon}"/>
-                    </Button>-->
+                    </Button>--><!--
                     <Label
                         Grid.Column="2"
                         Content="00:00"
@@ -123,28 +125,28 @@
                         Grid.Column="4"
                         Content="00:00"
                         x:Name="timeTotal"/>
-                    <!--<Button Grid.Column="5">
+                    --><!--<Button Grid.Column="5">
                         <Path Data="{StaticResource volumeLowIcon}"/>
-                    </Button>-->
+                    </Button>--><!--
                     <Button Grid.Column="5">
                         <Path Width="20" Data="{StaticResource volumeOffIcon}"/>
                     </Button>
-                    <!--<Button Grid.Column="5">
+                    --><!--<Button Grid.Column="5">
                         <Path Data="{StaticResource volumeBigIcon}"/>
-                    </Button>-->
+                    </Button>--><!--
                     <Button Grid.Column="6">
                         <Path Data="{StaticResource settingsIcon}"/>
                     </Button>
-                    <!--<Button Grid.Column="7">
+                    --><!--<Button Grid.Column="7">
                         <Path   Data="{StaticResource fullscreenExitIcon}"/>
-                    </Button>-->
+                    </Button>--><!--
                     <Button Click="WindowStateToggle" Grid.Column="7">
                         <Path  Data="{StaticResource fullscreenIcon}"/>
                     </Button>
 
 
                 </Grid>
-            </Grid>
+            </Grid>-->
         
     </Grid>
 

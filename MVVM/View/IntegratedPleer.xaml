@@ -9,14 +9,14 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
 
-            <!--<uc:VlcControl 
+        <!--<uc:VlcControl 
             Background="Black"
             x:Name="VideoView" Panel.ZIndex="-1" SizeChanged="VideoNormalizer">-->
-            <Grid>
-                <ContentControl 
+        <Grid>
+            <ContentControl 
                     Panel.ZIndex="-1"
                     Name="ControlContainer">
-                </ContentControl>
+            </ContentControl>
             <Button
                     x:Name="nextEpisodeBut"
                     Panel.ZIndex="100"
@@ -26,8 +26,8 @@
                         VerticalAlignment="Center"
                         HorizontalAlignment="Right">
 
-                </Button>
-                <Button
+            </Button>
+            <Button
                     x:Name="prevEpisodeBut"
                     Panel.ZIndex="100"
                     Background="Green"
@@ -36,8 +36,8 @@
                         VerticalAlignment="Center"
                         HorizontalAlignment="Left">
 
-                </Button>
-                <Button
+            </Button>
+            <Button
                     x:Name="closeButton"
                     Panel.ZIndex="10000"
                     HorizontalAlignment="Right"
@@ -48,15 +48,15 @@
                     MinWidth="25"
                     Width="25"
                     Height="25">
-                </Button>
-                <Label
+            </Button>
+            <Label
                     x:Name="animeName"
                     Content="Название тайтла"
                        FontSize="40"
                        FontFamily="/Fonts/#ARNOLD-BOLD"
                        Foreground="WhiteSmoke"
                        Padding="50"/>
-                <Grid
+            <Grid
                     Panel.ZIndex="1"
                     MouseMove="hideControls"
                     x:Name="controlsGrid"
@@ -64,22 +64,22 @@
                     Background="#01FFFFFF"
                     Style="{StaticResource PleerButtonsStyles}"
                     VerticalAlignment="Bottom">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="0.5*"/>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="20*"/>
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="0.5*"/>
-                    </Grid.ColumnDefinitions>
-                    <Button Grid.Column="1" Click="PlayButton_Click">
-                        <Path x:Name="playPauseToggle" 
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.5*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="20*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="0.5*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="1" Click="PlayButton_Click">
+                    <Path x:Name="playPauseToggle" 
                               Data="{StaticResource pauseIcon}"/>
-                    </Button>
-                    <!--<Button Grid.Column="1">
+                </Button>
+                <!--<Button Grid.Column="1">
                         <Path  Data="{StaticResource playIcon}"/>
                     </Button>-->
                 <Label
@@ -99,35 +99,55 @@
                     Thumb.DragCompleted="endedSlider"
                     VerticalAlignment="Center"
                     >
-                    
+
                 </Slider>
-                    <Label
+                <Label
                         MinWidth="45"
                         Grid.Column="4"
                         Content="00:00"
                         x:Name="timeTotal"/>
-                    <!--<Button Grid.Column="5">
+                <!--<Button Grid.Column="5">
                         <Path Data="{StaticResource volumeLowIcon}"/>
                     </Button>-->
-                    <Button Grid.Column="5">
-                        <Path Width="20" Data="{StaticResource volumeOffIcon}"/>
-                    </Button>
-                    <!--<Button Grid.Column="5">
+                <Button Grid.Column="5">
+                    <Path Width="20" Data="{StaticResource volumeOffIcon}"/>
+                </Button>
+                <Canvas Grid.Column="5">
+                    <Slider
+                        Canvas.Top="-100"
+                        Width="27"
+                        Height="100"
+                        Maximum="200"
+                        
+                        ValueChanged="soundSliderChange"
+                        Orientation="Vertical">
+                        <Slider.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform/>
+                                <RotateTransform/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Slider.RenderTransform>
+
+                    </Slider>
+                </Canvas>
+                <!--<Button Grid.Column="5">
                         <Path Data="{StaticResource volumeBigIcon}"/>
                     </Button>-->
-                    <Button Grid.Column="6">
-                        <Path Data="{StaticResource settingsIcon}"/>
-                    </Button>
-                    <!--<Button Grid.Column="7">
+                <Button Grid.Column="6">
+                    <Path Data="{StaticResource settingsIcon}"/>
+                </Button>
+                <!--<Button Grid.Column="7">
                         <Path   Data="{StaticResource fullscreenExitIcon}"/>
                     </Button>-->
-                    <Button Grid.Column="7" Click="WindowStateToggle" Cursor="Hand">
-                        <Path  Data="{StaticResource fullscreenIcon}"/>
-                    </Button>
+                <Button Grid.Column="7" Click="WindowStateToggle" Cursor="Hand">
+                    <Path  Data="{StaticResource fullscreenIcon}"/>
+                </Button>
 
 
-                </Grid>
             </Grid>
-        
+        </Grid>
+
     </Grid>
 </UserControl>

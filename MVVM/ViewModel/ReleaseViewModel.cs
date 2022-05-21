@@ -355,7 +355,7 @@ namespace testWpf.MVVM.ViewModel
                 string kodikUrl = await resp.GetSeriaLink(resp.getEpisodesUrl, releaseInfo.GetId().ToString(), voicesID.vID[0].id, _selectedEpisodeItem);
                 string videoUrl = await resp.GetVideoUrl(kodikUrl);
                 isPleerNeedOpen = true;
-                pleerWindow = new IntegratedPleer(videoUrl, voicesID.vID[0].id, _selectedEpisodeItem,comboboxEpisodesData.Last(),comboboxEpisodesData.First());
+                pleerWindow = new IntegratedPleer(videoUrl, voicesID.vID[0].id, _selectedEpisodeItem, comboboxEpisodesData);
 
             }
         }
@@ -368,7 +368,7 @@ namespace testWpf.MVVM.ViewModel
                 {
                     string kodikUrl = await resp.GetSeriaLink(resp.getEpisodesUrl, releaseInfo.GetId().ToString(), voicesID.vID[0].id, _selectedEpisodeItem);
                     string videoUrl = await resp.GetVideoUrl(kodikUrl);
-                    var a = new WatchingRoomModel.Properties(videoUrl, voicesID.vID[0].id, int.Parse(_selectedEpisodeItem), int.Parse(comboboxEpisodesData.Last()), int.Parse(comboboxEpisodesData.First()),true);
+                    var a = new WatchingRoomModel.Properties(videoUrl, voicesID.vID[0].id, int.Parse(_selectedEpisodeItem), comboboxEpisodesData, true);
                     MainViewModel.Instance.CurrentView = new WatchingRoomModel(a);
                 }
 
