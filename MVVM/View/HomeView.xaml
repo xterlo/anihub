@@ -15,7 +15,7 @@
     </UserControl.Resources>
 
     <Grid>
-        <StackPanel Background="Red">
+        <StackPanel Background="Purple">
             <TextBlock 
                 Margin="5,10,0,0"
                 FontSize="32"

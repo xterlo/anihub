@@ -10,6 +10,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Interactivity;
+using System.Windows.Media;
 using System.Windows.Threading;
 using testWpf.Core;
 
@@ -17,6 +19,16 @@ namespace testWpf.MVVM.ViewModel
 {
     internal class MainViewModel : ObserverObject
     {
+
+        #region UI ICOMMANDS
+
+        public ICommand _homeViewCommand { get; set; }
+        public ICommand _discoveryViewCommand { get; set; }
+        public ICommand _releaseViewCommand { get; set; }
+
+        #endregion
+
+        #region UI RelayCommands 
         public RelayCommand HomeViewCommand { get; set; }
         public RelayCommand DiscoveryViewCommand { get; set; }
         public RelayCommand ReleaseViewCommand { get; set; }
@@ -24,6 +36,8 @@ namespace testWpf.MVVM.ViewModel
         public DiscoveryViewModel DiscoveryVm { get; set; }
         public ReleaseViewModel ReleaseVm { get; set; }
         public WatchingRoomModel WatchVm { get; set; }
+
+        #endregion
 
         private ObservableCollection<SearchViewModel> _searchViewModel;
         public ObservableCollection<SearchViewModel> searchViewModel
@@ -83,28 +97,33 @@ namespace testWpf.MVVM.ViewModel
             }
         }
         public static MainViewModel Instance;
+
+
         public MainViewModel()
         {
             Instance = this;
             searchViewModel = new ObservableCollection<SearchViewModel>();
             HomeVm = new HomeViewModel();
             DiscoveryVm = new DiscoveryViewModel();
-            //ReleaseVm = new ReleaseViewModel();
+            ReleaseVm = new ReleaseViewModel();
             CurrentView = HomeVm;
 
-           // HomeViewCommand = new RelayCommand<MainViewModel>(o =>
-           // {
-           //     CurrentView = HomeVm;
-           // });
+            _homeViewCommand = new RelayCommand<HomeViewModel>(o =>
+            {
+                Console.WriteLine("HOME");
+                CurrentView = HomeVm;
+            });
 
-           // DiscoveryViewCommand = new RelayCommand(o =>
-           //{
-           //    CurrentView = DiscoveryVm;
-           //});
-            //ReleaseViewCommand = new RelayCommand(o =>
-            //{
-            //    CurrentView = ReleaseVm;
-            //});
+            _discoveryViewCommand = new RelayCommand<DiscoveryViewModel>(o =>
+           {
+               Console.WriteLine("DISCOVERY");
+               CurrentView = DiscoveryVm;
+           });
+
+            _releaseViewCommand = new RelayCommand<ReleaseViewModel>(o =>
+            {
+                CurrentView = ReleaseVm;
+            });
         }
 
     }

@@ -35,8 +35,9 @@ namespace testWpf.MVVM.View
         {
             ResponseHandler response = new ResponseHandler();
             await response.GetRelease("3333");
-            object releaseViewContent = this.Resources["ReleaseViewContent"];
-            this.Content = releaseViewContent;
+            MainViewModel.Instance.CurrentView = new ReleaseViewModel();
+            //object releaseViewContent = this.Resources["ReleaseViewContent"];
+            //this.Content = releaseViewContent;
         }
 
 

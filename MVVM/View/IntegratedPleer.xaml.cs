@@ -333,7 +333,7 @@ namespace testWpf.MVVM.View
         {
             InitializeComponent();
             initVideoView();
-            animeName.Content = TemplatePreferens.releaseInfo.GetTitleRu() + " ⚫ " + properties.episode.ToString();
+            
             properties.PropertyChanged += (s, e) =>
             {
                 Dispatcher.BeginInvoke(new Action(delegate
@@ -511,6 +511,7 @@ namespace testWpf.MVVM.View
                 VideoView.SourceProvider.MediaPlayer.Play(new Uri(properties.urlvideo));
                 isNeedUpdateProperties["episode"] = false;
             }
+            animeName.Content = TemplatePreferens.releaseInfo.GetTitleRu() + " ⚫ " + properties.episode.ToString();
 
             //_mediaPlayer.Volume = 30;
 

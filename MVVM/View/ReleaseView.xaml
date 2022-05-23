@@ -98,21 +98,52 @@
                                         </ImageBrush>
                                     </Border.Background>
                                 </Border>
+                                <Grid 
+                                    Margin="0 15 0 0"
+                                    HorizontalAlignment="Stretch">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width=".4*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ComboBox
+                                        Margin="0 0 5 0"
+                                        ItemsSource="{Binding comboboxVoicesData}"
+                                        SelectedItem="{Binding SelectedVoiceItem}"
+                                        x:Name="voicesComboBox"
+                                        Height="35"
+                                        Style="{StaticResource theComboBox}"
+                                        HorizontalAlignment="Stretch">
 
+                                    </ComboBox>
+                                    
+                                    <ComboBox
+                                        
+                                        Grid.Column="1"
+                                        ItemsSource="{Binding comboboxEpisodesData}"
+                                        SelectedItem="{Binding SelectedEpisodeItem}"
+                                        x:Name="seriesComboBox"
+                                        Style="{StaticResource theComboBox}"
+                                        HorizontalAlignment="Stretch">
+
+                                    </ComboBox>
+                                </Grid>
                                 <Button
-                                    Background="Black"
+                                    Background="#fdaf4b"
                                     Content="Смотреть"
-                        Height="50"
-                        MaxWidth="250"
-                        MinWidth="130"
-                        Margin="0,20,0,0"
-                        HorizontalAlignment="Stretch"
-                        
-                        FontSize="26"
-                        Foreground="#d6d5d9"
-                        Command="{Binding WatchButtonClickCommand}">
+                                    Foreground="Black"
+                                    Margin="0 10 0 0"
+                                    Height="45"
+                                    MinWidth="130"
+                                    HorizontalAlignment="Stretch"
+                                    FontSize="22"
+                                    Command="{Binding WatchButtonClickCommand}">
+                                    <Button.Resources>
+                                        <Style TargetType="Border">
+                                            <Setter Property="CornerRadius" Value="10 10 50 50"/>
+                                        </Style>
+                                    </Button.Resources>
                                 </Button>
-                                <TextBox
+                                <!--<TextBox
                                     Text="{Binding searchData,UpdateSourceTrigger=PropertyChanged}">
                                     
                                 </TextBox>
@@ -128,7 +159,7 @@
                         FontSize="20"
                         Foreground="#d6d5d9"
                         Command="{Binding TogetherButtonClickCommand}">
-                                </Button>
+                                </Button>-->
                             </StackPanel>
                             <StackPanel 
                         HorizontalAlignment="Left"
@@ -163,22 +194,7 @@
                         TextWrapping="WrapWithOverflow"
                         Text="{Binding ReleaseDescription}"
                         LineStackingStrategy="BlockLineHeight"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <ComboBox
-                                        ItemsSource="{Binding comboboxVoicesData}"
-                                        SelectedItem="{Binding SelectedVoiceItem}"
-                                        x:Name="voicesComboBox"
-                                        Width="200">
-
-                                    </ComboBox>
-                                    <ComboBox 
-                                        ItemsSource="{Binding comboboxEpisodesData}"
-                                        SelectedItem="{Binding SelectedEpisodeItem}"
-                                        x:Name="seriesComboBox"
-                                        Width="50">
-
-                                    </ComboBox>
-                                </StackPanel>
+                                
                             </StackPanel>
                         </Grid>
                     </Grid>

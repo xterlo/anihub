@@ -62,7 +62,7 @@ namespace testWpf
 
         private void OnClickExitButton(object sender, RoutedEventArgs e)
         {
-            SocketManager.SocketLeaveRoom();
+            //SocketManager.SocketLeaveRoom();
             Close();
         }
 
