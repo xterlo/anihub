@@ -43,7 +43,9 @@ namespace testWpf.MVVM.ViewModel
         public IntegratedPleer pleerWindow
         {
             get { return _pleerWindow; }
-            set { _pleerWindow = value;
+            set
+            {
+                _pleerWindow = value;
                 OnPropertyChanged(nameof(pleerWindow));
             }
         }
@@ -53,7 +55,7 @@ namespace testWpf.MVVM.ViewModel
         public event PropertyChangedEventHandler PropertyChanged;
 
         public static bool isPleerNeedOpen;
-       
+
 
         private ReleaseInfo _releaseInfo;
         public ReleaseInfo releaseInfo
@@ -106,7 +108,7 @@ namespace testWpf.MVVM.ViewModel
                 OnPropertyChanged(nameof(ReleaseName));
             }
         }
-      
+
         public string ReleaseOriginalName
         {
             get
@@ -165,8 +167,11 @@ namespace testWpf.MVVM.ViewModel
         public string grade
         {
             get { return _grade; }
-            set { _grade = value; 
-                OnPropertyChanged(nameof(grade));}
+            set
+            {
+                _grade = value;
+                OnPropertyChanged(nameof(grade));
+            }
         }
 
         private double _vote1;
@@ -273,31 +278,33 @@ namespace testWpf.MVVM.ViewModel
         }
         #endregion
 
-        public ReleaseViewModel( )
+        public ReleaseViewModel()
         {
             Instance = this;
             WatchButtonClickCommand = new RelayCommand<object>(WatchButtonClick);
             TogetherButtonClickCommand = new RelayCommand<object>(TogetherButtonClick);
             comboboxVoicesData = new ObservableCollection<string>();
             comboboxEpisodesData = new ObservableCollection<string>();
-            releaseInfo = TemplatePreferens.releaseInfo;
-            ReleaseName = releaseInfo.GetTitleRu();
-            ReleaseOriginalName = releaseInfo.GetTitleOriginal();
-            ReleaseDescription = releaseInfo.GetDescription();
-            ReleasePoster = releaseInfo.GetPoster();
             relatedReleaseModel = new ObservableCollection<RelatedReleaseModel>();
             screenshotsViewModel = new ObservableCollection<ScreenshotsViewModel>();
-            getReleases();
-            getVoices();
-            addScreenshots();
-            getGrades();
+            if (!(TemplatePreferens.releaseInfo.result is null))
+            {
+                releaseInfo = TemplatePreferens.releaseInfo;
+                ReleaseName = releaseInfo.GetTitleRu();
+                ReleaseOriginalName = releaseInfo.GetTitleOriginal();
+                ReleaseDescription = releaseInfo.GetDescription();
+                ReleasePoster = releaseInfo.GetPoster();
+                getReleases();
+                getVoices();
+                addScreenshots();
+                getGrades();
+            }
         }
-
         public async void getVoices()
         {
             ResponseHandler resp = new ResponseHandler();
             voices = await resp.GetVoice(resp.getEpisodesUrl, releaseInfo.GetId().ToString());
-            foreach(Voice voice in voices.result)
+            foreach (Voice voice in voices.result)
             {
                 comboboxVoicesData.Add(voice.name);
             }
@@ -319,7 +326,7 @@ namespace testWpf.MVVM.ViewModel
 
         public void addScreenshots()
         {
-            int count=0;
+            int count = 0;
             foreach (var s in TemplatePreferens.releaseInfo.GetScreenshots())
             {
                 screenshotsViewModel.Add(new ScreenshotsViewModel(count));
@@ -330,7 +337,7 @@ namespace testWpf.MVVM.ViewModel
         public void getGrades()
         {
             var a = TemplatePreferens.releaseInfo.GetGrades();
-            grade = a[0].Remove(3,a[0].Length-3);
+            grade = a[0].Remove(3, a[0].Length - 3);
             double maxWidth = 300;
             vote1 = gradesNormalizer((double.Parse(a[1]) / double.Parse(a[6])) * maxWidth);
             vote2 = gradesNormalizer((double.Parse(a[2]) / double.Parse(a[6])) * maxWidth);
@@ -349,9 +356,9 @@ namespace testWpf.MVVM.ViewModel
 
         private async void WatchButtonClick(object notUsed = null)
         {
-            if(SelectedEpisodeItem != null && SelectedVoiceItem != null)
+            if (SelectedEpisodeItem != null && SelectedVoiceItem != null)
             {
-                
+
                 string kodikUrl = await resp.GetSeriaLink(resp.getEpisodesUrl, releaseInfo.GetId().ToString(), voicesID.vID[0].id, _selectedEpisodeItem);
                 string videoUrl = await resp.GetVideoUrl(kodikUrl);
                 isPleerNeedOpen = true;
@@ -373,7 +380,7 @@ namespace testWpf.MVVM.ViewModel
                 }
 
             }
-            else if(searchData != null || searchData.Length > 1)
+            else if (searchData != null || searchData.Length > 1)
             {
                 MainViewModel.Instance.CurrentView = new WatchingRoomModel(searchData);
             }
@@ -389,8 +396,8 @@ namespace testWpf.MVVM.ViewModel
                 {
                     selectedVoice = voice;
                     voicesID = await resp.GetVoiceID(resp.getEpisodesUrl, releaseInfo.GetId().ToString(), selectedVoice.id);
-                    series = await resp.GetSeries(resp.getEpisodesUrl, releaseInfo.GetId().ToString(),selectedVoice.id,voicesID.vID[0].id);
-                    foreach(Positions pos in series.episodes)
+                    series = await resp.GetSeries(resp.getEpisodesUrl, releaseInfo.GetId().ToString(), selectedVoice.id, voicesID.vID[0].id);
+                    foreach (Positions pos in series.episodes)
                     {
                         comboboxEpisodesData.Add(pos.position.ToString());
                     }

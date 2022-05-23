@@ -95,7 +95,7 @@ namespace testWpf.MVVM.ViewModel
         public int episode { get; set; }
 
         [JsonProperty("episodes")]
-        public ObservableCollection<string> episodes { get; set; }
+        public ObservableCollection<int> episodes { get; set; }
 
         [JsonProperty("urlvideo")]
         public string urlvideo { get; set; }
@@ -122,9 +122,7 @@ namespace testWpf.MVVM.ViewModel
             {
                 ObservableCollection<int> episodes_int = new ObservableCollection<int>();
                 this.voicesId = prop.voicesId;
-                foreach (var episode in prop.episodes)
-                    episodes_int.Add(int.Parse(episode));
-                this.episodes = episodes_int;
+                this.episodes = prop.episodes;
                 this.videoLength = prop.videoLength;
                 this.winPos = prop.winPos;
                 this.winTime = prop.winTime;
