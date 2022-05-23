@@ -86,7 +86,7 @@ namespace testWpf.Core
     {
 
         [JsonProperty("release")]
-        private ReleaseData result { get; set; }
+        public ReleaseData result { get; set; }
 
         public int GetId() {
             return result.id;
@@ -209,7 +209,7 @@ namespace testWpf.Core
             return dict;
         }
 
-        private class ReleaseData
+        public class ReleaseData
         {
             [JsonProperty("id")]
             public int id { get; set; }
