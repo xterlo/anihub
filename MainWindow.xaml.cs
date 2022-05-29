@@ -9,6 +9,11 @@ using testWpf.MVVM.View;
 using testWpf.MVVM.ViewModel;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Runtime.InteropServices;
+using System.Windows.Interop;
+using System.Collections.Generic;
+using System.Windows.Media;
+using System.Reflection;
 
 namespace testWpf
 {
@@ -26,7 +31,6 @@ namespace testWpf
             InitializeComponent();
             this.MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight;
             _oldWindowSize = new Size(Width, Height);
-
         }
         
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -85,13 +89,120 @@ namespace testWpf
 
         private void MinimizeWindow(object sender, RoutedEventArgs e) 
         {
-            WindowState = WindowState.Minimized;
+            Minimize(this);
         }
 
         private void MaximizeWindow(object sender, RoutedEventArgs e)
         {
             WindowStateToggle();
         }
+
+        #region TEST
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr MonitorFromWindow(IntPtr hwnd, int dwFlags);
+
+        // To get the working area of the specified monitor
+        [DllImport("user32.dll")]
+        private static extern bool GetMonitorInfo(HandleRef hmonitor, [In, Out] MonitorInfoEx monitorInfo);
+
+        private static MonitorInfoEx GetMonitorInfo(Window window, IntPtr monitorPtr)
+        {
+            var monitorInfo = new MonitorInfoEx();
+
+            monitorInfo.cbSize = Marshal.SizeOf(monitorInfo);
+            GetMonitorInfo(new HandleRef(window, monitorPtr), monitorInfo);
+
+            return monitorInfo;
+        }
+
+        private static void Minimize(Window window)
+        {
+            if (window == null)
+            {
+                return;
+            }
+
+            window.WindowState = WindowState.Minimized;
+        }
+
+        private static void Restore(Window window)
+        {
+            if (window == null)
+            {
+                return;
+            }
+
+            window.WindowState = WindowState.Normal;
+            window.ResizeMode = ResizeMode.CanResizeWithGrip;
+        }
+
+        private static void Maximize(Window window)
+        {
+            window.ResizeMode = ResizeMode.NoResize;
+
+            // Get handle for nearest monitor to this window
+            var wih = new WindowInteropHelper(window);
+
+            // Nearest monitor to window
+            const int MONITOR_DEFAULTTONEAREST = 2;
+            var hMonitor = MonitorFromWindow(wih.Handle, MONITOR_DEFAULTTONEAREST);
+
+            // Get monitor info
+            var monitorInfo = GetMonitorInfo(window, hMonitor);
+
+            // Create working area dimensions, converted to DPI-independent values
+            var source = HwndSource.FromHwnd(wih.Handle);
+
+            if (source?.CompositionTarget == null)
+            {
+                return;
+            }
+
+            var matrix = source.CompositionTarget.TransformFromDevice;
+            var workingArea = monitorInfo.rcWork;
+
+            var dpiIndependentSize =
+                matrix.Transform(
+                    new Point(workingArea.Right - workingArea.Left,
+                              workingArea.Bottom - workingArea.Top));
+
+
+
+            // Maximize the window to the device-independent working area ie
+            // the area without the taskbar.
+            window.Top = workingArea.Top;
+            window.Left = workingArea.Left;
+
+            window.MaxWidth = dpiIndependentSize.X;
+            window.MaxHeight = dpiIndependentSize.Y;
+
+            window.WindowState = WindowState.Maximized;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Rect
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
+        }
+
+        // Monitor information (used by GetMonitorInfo())
+        [StructLayout(LayoutKind.Sequential)]
+        public class MonitorInfoEx
+        {
+            public int cbSize;
+            public Rect rcMonitor; // Total area
+            public Rect rcWork; // Working area
+            public int dwFlags;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x20)]
+            public char[] szDevice;
+        }
+
+        #endregion
+
 
         private void WindowStateChecker(object sender, EventArgs e)
         {
@@ -110,19 +221,23 @@ namespace testWpf
 
         private void WindowStateToggle()
         {
+
+
             if (WindowState == WindowState.Normal)
             {
-                _oldWindowSize = new Size(Width, Height);
-                _oldWindowState = WindowState;
-                ResizeMode = ResizeMode.NoResize;
-                WindowStyle = WindowStyle.None;
-                WindowState = WindowState.Maximized;
+                //_oldWindowSize = new Size(Width, Height);
+                //_oldWindowState = WindowState;
+                //WindowState = WindowState.Maximized;
+                //ResizeMode = ResizeMode.NoResize;
+                //WindowStyle = WindowStyle.None;
+                Maximize(this);
                 
             }
             else
             {
-                WindowState = _oldWindowState;
-                ResizeMode = ResizeMode.CanResize;
+                //WindowState = _oldWindowState;
+                //ResizeMode = ResizeMode.CanResize;
+                Restore(this);
             }
         }
 

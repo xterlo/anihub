@@ -358,8 +358,8 @@ namespace testWpf.MVVM.ViewModel
                     break;
                 case SocketManager.eventType.acceptRoomInfo:
                     roomInfo = sender as SocketRoomInfo;
-                    ResponseHandler response = new ResponseHandler();
-                    await response.GetRelease(roomInfo.animeid.ToString()); 
+                    ResponseHandler response = new ResponseHandler(roomInfo.animeid.ToString());
+                    await response.GetRelease(); 
                     if (properties is null)
                         InitPleer();
                     break;

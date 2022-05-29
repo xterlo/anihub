@@ -5,10 +5,10 @@
     <Style x:Key="NavBarBorderStyle" TargetType="Border">
         <Setter Property="Margin" Value="30 5 30 0" />
         <Setter Property="CornerRadius" Value="5" />
-        <Setter Property="Background" Value="#FF241F3D" />
+        <Setter Property="Background" Value="{DynamicResource backgroundColor}" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#FF38305D"/>
+                <Setter Property="Background" Value="{DynamicResource modelColor}"/>
                 <Setter Property="Cursor" Value="Hand"/>
             </Trigger>
         </Style.Triggers>

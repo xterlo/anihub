@@ -14,6 +14,7 @@ namespace testWpf.Core
     public class TemplatePreferens
     {
         private static ReleaseInfo _releaseInfo = new ReleaseInfo();
+        private static RelatedReleases _relatedReleases = new RelatedReleases();
         private static VlcControl _VideoView = new VlcControl();
         public static VlcControl VideoView
         {
@@ -26,7 +27,12 @@ namespace testWpf.Core
             get { return _releaseInfo; } 
             set { _releaseInfo = value; } 
         }
-        
+        public static RelatedReleases relatedReleases
+        {
+            get { return _relatedReleases; }
+            set { _relatedReleases = value; }
+        }
+
         public TemplatePreferens(ReleaseInfo r)
         {
             releaseInfo = r;

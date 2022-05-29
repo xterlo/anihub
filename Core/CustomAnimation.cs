@@ -116,6 +116,56 @@ namespace testWpf.Core
             }
         }
 
+        public async Task SvgAnimation(Func<double, double> animFormula, int dur,  Color minFill, Color maxFill, Color minStroke, Color maxStroke, bool reverse = false)
+        {
+            long start = UnixTimeNow();
+            duraion = dur;
+            double progress = 0;
+            if (!isStarted)
+            {
+                while (progress >= 0)
+                {
+                    progress = await Task.Run(() => Animate(animFormula, duraion, start));
+                    if (progress != -1)
+                    {
+                        Path obj = animationObject as Path;
+                        byte a,r,g,b;
+                        if (!reverse)
+                        {
+                            a = (byte)(((maxFill.A - minFill.A) * progress) + minFill.A);
+                            r = (byte)(((maxFill.R - minFill.R) * progress) + minFill.R);
+                            g = (byte)(((maxFill.G - minFill.G) * progress) + minFill.G);
+                            b = (byte)(((maxFill.B - minFill.B) * progress) + minFill.B);
+                            obj.Fill = new SolidColorBrush(Color.FromArgb(a, r, g, b));
+                            a = (byte)(((maxStroke.A - minStroke.A) * progress) + minStroke.A);
+                            r = (byte)(((maxStroke.R - minStroke.R) * progress) + minStroke.R);
+                            g = (byte)(((maxStroke.G - minStroke.G) * progress) + minStroke.G);
+                            b = (byte)(((maxStroke.B - minStroke.B) * progress) + minStroke.B);
+                            obj.Stroke = new SolidColorBrush(Color.FromArgb(a, r, g, b));
+                        }
+                        if (reverse)
+                        {
+                            a = (byte)(((minFill.A - maxFill.A) * progress) + maxFill.A);
+                            r = (byte)(((minFill.R - maxFill.R) * progress) + maxFill.R);
+                            g = (byte)(((minFill.G - maxFill.G) * progress) + maxFill.G);
+                            b = (byte)(((minFill.B - maxFill.B) * progress) + maxFill.B);
+                            obj.Fill = new SolidColorBrush(Color.FromArgb(a, r, g, b));
+                            a = (byte)(((minStroke.A - maxStroke.A) * progress) + maxStroke.A);
+                            r = (byte)(((minStroke.R - maxStroke.R) * progress) + maxStroke.R);
+                            g = (byte)(((minStroke.G - maxStroke.G) * progress) + maxStroke.G);
+                            b = (byte)(((minStroke.B - maxStroke.B) * progress) + maxStroke.B);
+                            obj.Stroke = new SolidColorBrush(Color.FromArgb(a, r, g, b));
+                        }
+                        isStarted = true;
+                    }
+                    else
+                    {
+                        isStarted = false;
+                    }
+                }
+            }
+        }
+
 
         public long UnixTimeNow()
         {

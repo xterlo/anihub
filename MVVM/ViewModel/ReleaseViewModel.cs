@@ -5,22 +5,29 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interactivity;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using testWpf.Core;
 using testWpf.MVVM.View;
 using static testWpf.Core.Series;
 using static testWpf.Core.Voices;
+using Color = System.Windows.Media.Color;
+using LinearGradientBrush = System.Windows.Media.LinearGradientBrush;
 
 namespace testWpf.MVVM.ViewModel
 {
@@ -82,7 +89,7 @@ namespace testWpf.MVVM.ViewModel
         private string _ReleaseDescription;
         private string _ReleaseName;
         private string _ReleaseOriginalName;
-        private string _ReleasePoster;
+        private ImageSource _ReleasePoster;
 
         public string ReleaseDescription
         {
@@ -121,11 +128,11 @@ namespace testWpf.MVVM.ViewModel
                 OnPropertyChanged(nameof(ReleaseOriginalName));
             }
         }
-        public string ReleasePoster
+        public ImageSource ReleasePoster
         {
             get
             {
-                return $@"https://static.anixart.tv/posters/{_ReleasePoster}.jpg"; ;
+                return _ReleasePoster ;
             }
             set
             {
@@ -278,47 +285,228 @@ namespace testWpf.MVVM.ViewModel
         }
         #endregion
 
+        #region Sizes
+
+        private double _windowWidth;
+        public double WindowWidth
+        {
+            set
+            {
+                _windowWidth = value;
+                resizeX(value);
+            }
+        }
+
+        private double _windowHeight;
+        public double WindowHeight
+        {
+              set
+            {
+                _windowHeight = value;
+                resizeY(value);
+            }
+        }
+
+        private double _imageBlockWidth;
+        public double ImageBlockWidth
+        {
+            get { return _imageBlockWidth; }
+
+            set
+            {
+                _imageBlockWidth = value;
+                OnPropertyChanged(nameof(ImageBlockWidth));
+            }
+        }
+
+        private double _imageBlockHeight;
+        public double ImageBlockHeight
+        {
+            get { return _imageBlockHeight; }
+
+            set
+            {
+                _imageBlockHeight = value;
+                OnPropertyChanged(nameof(ImageBlockHeight));
+            }
+        }
+
+
+        public void resizeX(double width)
+        {
+            ImageBlockWidth = width;
+            Console.WriteLine($"RESIZE X {width}");
+        }
+
+        public void resizeY(double height)
+        {
+            Console.WriteLine($"RESIZE Y {height}");
+
+        }
+
+        #endregion
+
+        #region UI SETTINGS
+
+        private Visibility _templateImage = Visibility.Visible;
+        public Visibility TemplateImage
+        {
+            get { return _templateImage;}
+            set { 
+                _templateImage = value;
+                OnPropertyChanged(nameof(TemplateImage));
+            }
+        }
+
+        private System.Windows.Media.LinearGradientBrush _animateTemplate;
+
+        public System.Windows.Media.LinearGradientBrush AnimateTemplate
+        {
+            get { return _animateTemplate;}
+            set
+            {
+                _animateTemplate = value;
+                OnPropertyChanged(nameof(AnimateTemplate));
+            }
+        }
+
+        public double stepLinearGradient = 0;
+        public DispatcherTimer _timer = new DispatcherTimer(DispatcherPriority.Render);
+        #endregion
+
+
+        public ReleaseViewModel(string releaseID)
+        {
+            Instance = this;
+            resp = new ResponseHandler(releaseID);
+            resp.endGetRelease += Initialization;
+            _timer.Interval = TimeSpan.FromMilliseconds(20);
+            _timer.Tick += (sender, args) =>
+            {
+                AnimateTemplates();
+            };
+            _timer.Start();
+            
+            Task.Run(()=>resp.GetRelease());
+        }
+
         public ReleaseViewModel()
         {
             Instance = this;
+        }
+        public async void Initialization()
+        {
+            
             WatchButtonClickCommand = new RelayCommand<object>(WatchButtonClick);
             TogetherButtonClickCommand = new RelayCommand<object>(TogetherButtonClick);
             comboboxVoicesData = new ObservableCollection<string>();
             comboboxEpisodesData = new ObservableCollection<string>();
             relatedReleaseModel = new ObservableCollection<RelatedReleaseModel>();
             screenshotsViewModel = new ObservableCollection<ScreenshotsViewModel>();
-            if (!(TemplatePreferens.releaseInfo.result is null))
+            Console.WriteLine(TemplatePreferens.releaseInfo.result);
+            releaseInfo = TemplatePreferens.releaseInfo;
+            ReleaseName = releaseInfo.GetTitleRu();
+            ReleaseOriginalName = releaseInfo.GetTitleOriginal();
+            ReleaseDescription = releaseInfo.GetDescription();
+            App.Current.Dispatcher.Invoke(() =>
             {
-                releaseInfo = TemplatePreferens.releaseInfo;
-                ReleaseName = releaseInfo.GetTitleRu();
-                ReleaseOriginalName = releaseInfo.GetTitleOriginal();
-                ReleaseDescription = releaseInfo.GetDescription();
-                ReleasePoster = releaseInfo.GetPoster();
-                getReleases();
-                getVoices();
-                addScreenshots();
-                getGrades();
-            }
+                getRelated();
+            });
+            
+
+#pragma warning disable CS4014
+            Task.Run(() =>
+            {
+                App.Current.Dispatcher.Invoke((System.Action)delegate
+                {
+                    setPoster(releaseInfo.GetPoster());
+                });
+            });
+            Task.Run(() =>
+            {
+                App.Current.Dispatcher.Invoke((System.Action)delegate
+                {
+                    getVoices();
+                });
+            });
+            Task.Run(() =>
+            {
+                App.Current.Dispatcher.Invoke((System.Action)delegate
+                {
+                    addScreenshots();
+                });
+            });
+            Task.Run(() =>
+            {
+                App.Current.Dispatcher.Invoke((System.Action)delegate
+                {
+                    getGrades();
+                });
+            });
+
+#pragma warning restore CS4014
         }
+
+
+        public void AnimateTemplates()
+        {
+            if (stepLinearGradient > 50)
+                stepLinearGradient = 0;
+            double pos = stepLinearGradient / 50;
+            LinearGradientBrush LGB = new LinearGradientBrush();
+            LGB.StartPoint = new System.Windows.Point(0, 0);
+            LGB.EndPoint = new System.Windows.Point(1, 1);
+            LGB.GradientStops.Add(new GradientStop(Color.FromArgb(255, 34, 34, 42), pos + .2));
+            LGB.GradientStops.Add(new GradientStop(Color.FromArgb(150, 76, 76, 72), pos + .1));
+            LGB.GradientStops.Add(new GradientStop(Color.FromArgb(255, 34, 34, 42), pos));
+            AnimateTemplate = LGB;
+            stepLinearGradient += 1;
+        }
+
+
+
         public async void getVoices()
         {
-            ResponseHandler resp = new ResponseHandler();
-            voices = await resp.GetVoice(resp.getEpisodesUrl, releaseInfo.GetId().ToString());
+            voices = await resp.GetVoice(resp.getEpisodesUrl );
             foreach (Voice voice in voices.result)
             {
                 comboboxVoicesData.Add(voice.name);
+                
             }
+            Console.WriteLine("END VOICES");
         }
 
-        public async void getReleases()
+        private async void setPoster(string url)
         {
+            var httpClient = new HttpClient();
+            var responseStream = await httpClient.GetStreamAsync(url);
+            var bitmapImage = new BitmapImage();
+
+            using (var memoryStream = new MemoryStream())
+            {
+                await responseStream.CopyToAsync(memoryStream);
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                bitmapImage.BeginInit();
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.StreamSource = memoryStream;
+                bitmapImage.EndInit();
+                bitmapImage.Freeze();
+            }
+
+            ReleasePoster = bitmapImage;
+            TemplateImage = Visibility.Collapsed;
+            _timer.Stop();
+        }
+
+
+        public async void getRelated()
+        {
+            
             relatedReleaseModel.Clear();
-            ReleaseInfo relaseInfo = TemplatePreferens.releaseInfo;
-            ResponseHandler resp = new ResponseHandler();
-            RelatedReleases related = await resp.GetRelated(relaseInfo.GetRelated());
+            RelatedReleases related = TemplatePreferens.relatedReleases;
             foreach (var r in related.related_content)
             {
-                ContentControl contentControl = new ContentControl();
+                //ContentControl contentControl = new ContentControl();
                 RelatedReleaseModel relatedReleaseModelR = new RelatedReleaseModel(r);
                 relatedReleaseModel.Add(relatedReleaseModelR);
             }
@@ -332,6 +520,7 @@ namespace testWpf.MVVM.ViewModel
                 screenshotsViewModel.Add(new ScreenshotsViewModel(count));
                 count++;
             }
+            Console.WriteLine("END ADD SCREANSHOTES");
         }
 
         public void getGrades()
@@ -344,7 +533,7 @@ namespace testWpf.MVVM.ViewModel
             vote3 = gradesNormalizer((double.Parse(a[3]) / double.Parse(a[6])) * maxWidth);
             vote4 = gradesNormalizer((double.Parse(a[4]) / double.Parse(a[6])) * maxWidth);
             vote5 = gradesNormalizer((double.Parse(a[5]) / double.Parse(a[6])) * maxWidth);
-
+            Console.WriteLine("END GRADES");
             //Console.WriteLine("s");
         }
 
@@ -359,7 +548,7 @@ namespace testWpf.MVVM.ViewModel
             if (SelectedEpisodeItem != null && SelectedVoiceItem != null)
             {
 
-                string kodikUrl = await resp.GetSeriaLink(resp.getEpisodesUrl, releaseInfo.GetId().ToString(), voicesID.vID[0].id, _selectedEpisodeItem);
+                string kodikUrl = await resp.GetSeriaLink(resp.getEpisodesUrl, voicesID.vID[0].id, _selectedEpisodeItem);
                 string videoUrl = await resp.GetVideoUrl(kodikUrl);
                 isPleerNeedOpen = true;
                 pleerWindow = new IntegratedPleer(videoUrl, voicesID.vID[0].id, _selectedEpisodeItem, comboboxEpisodesData);
@@ -373,7 +562,7 @@ namespace testWpf.MVVM.ViewModel
             {
                 if (searchData is null || searchData.Length < 1)
                 {
-                    string kodikUrl = await resp.GetSeriaLink(resp.getEpisodesUrl, releaseInfo.GetId().ToString(), voicesID.vID[0].id, _selectedEpisodeItem);
+                    string kodikUrl = await resp.GetSeriaLink(resp.getEpisodesUrl,  voicesID.vID[0].id, _selectedEpisodeItem);
                     string videoUrl = await resp.GetVideoUrl(kodikUrl);
                     var a = new WatchingRoomModel.Properties(videoUrl, voicesID.vID[0].id, int.Parse(_selectedEpisodeItem), comboboxEpisodesData, true);
                     MainViewModel.Instance.CurrentView = new WatchingRoomModel(a);
@@ -395,8 +584,8 @@ namespace testWpf.MVVM.ViewModel
                 if (voice.name == SelectedVoiceItem)
                 {
                     selectedVoice = voice;
-                    voicesID = await resp.GetVoiceID(resp.getEpisodesUrl, releaseInfo.GetId().ToString(), selectedVoice.id);
-                    series = await resp.GetSeries(resp.getEpisodesUrl, releaseInfo.GetId().ToString(), selectedVoice.id, voicesID.vID[0].id);
+                    voicesID = await resp.GetVoiceID(resp.getEpisodesUrl,  selectedVoice.id);
+                    series = await resp.GetSeries(resp.getEpisodesUrl, selectedVoice.id, voicesID.vID[0].id);
                     foreach (Positions pos in series.episodes)
                     {
                         comboboxEpisodesData.Add(pos.position.ToString());

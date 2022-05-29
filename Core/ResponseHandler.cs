@@ -6,17 +6,30 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace testWpf.Core
 {
     public class ResponseHandler
     {
+        public event ReadyGetResponse endGetRelease;
+        public delegate void ReadyGetResponse();
+
+
         //https://api.anixart.tv/release/18265?extended_mode=true&token=d49a1e1b743a044bdefa82164e67e404532750ca
         public string getReleaseUrl = "https://api.anixart.tv/release/";
         public string getRelatedUrl = "https://api.anixart.tv/related/";
         public string getEpisodesUrl = "https://api.anixart.tv/episode/";
         public static string serverUrl = "http://176.193.215.228:4321/";
-
+        public string releaseID;
+        public ResponseHandler()
+        {
+            this.releaseID = null;
+        }
+        public ResponseHandler(string releaseID)
+        {
+            this.releaseID = releaseID;
+        }
 
         private async Task<string> GetResponseAsync(string url,bool needSign = false)
         {
@@ -30,57 +43,91 @@ namespace testWpf.Core
                 request.UserAgent = "AnixartApp / 7.9.2 - 21121202(Android 7.1.2; SDK 25; x86; samsung SM-G965N; ru";
                 request.Host = "api.anixart.tv";
             }
-            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
+            try
             {
-                return await reader.ReadToEndAsync();
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                using (Stream stream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    return await reader.ReadToEndAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                return "ServerError";
             }
         }
 
+        public bool CheckForInternetConnection()
+        {
+            try
+            {
+                using (var client = new WebClient())
+                using (var stream = client.OpenRead("http://176.193.215.228:4321/"))
+                {
+                    return true;
+                }
+            }
+            catch (WebException ex)
+            {
+                if (ex.Status == WebExceptionStatus.ProtocolError)
+                    return true;
+                return false;
+            }
+        }
 
-        public async Task GetRelease(string releaseID,bool extMode = true,string token="")
+        public async Task<string> CheckRoomExist(string roomid)
+        {
+            string url = $"{serverUrl}api/room?roomid={roomid}";
+            string response = await GetResponseAsync(url);
+
+            return response;
+        }
+
+        public async Task GetRelease(bool extMode = true,string token="")
         {
            
-            string url = $"{getReleaseUrl}{releaseID}?extended_mode={extMode}&token={token}";
+            string url = $"{getReleaseUrl}{this.releaseID}?extended_mode={extMode}&token={token}";
             string html = await GetResponseAsync(url);
 
             TemplatePreferens.releaseInfo = JsonConvert.DeserializeObject<ReleaseInfo>(html);
+            await GetRelated(TemplatePreferens.releaseInfo.GetRelated());
+            endGetRelease();
 
         }
 
-        public async Task<RelatedReleases> GetRelated(string relatedID, bool extMode = true, string token = "")
+        public async Task GetRelated(string relatedID, bool extMode = true, string token = "")
         {
 
             string url = $"{getRelatedUrl}{relatedID}/0";
             string html = await GetResponseAsync(url,true);
-            return JsonConvert.DeserializeObject<RelatedReleases>(html);
-
+            TemplatePreferens.relatedReleases = JsonConvert.DeserializeObject<RelatedReleases>(html);
         }
 
-        public async Task<Voices> GetVoice(string _url, string releaseID, bool extMode = true, string token = "")
+
+        public async Task<Voices> GetVoice(string _url, bool extMode = true, string token = "")
         {
 
-            string url = $"{_url}{releaseID}?extended_mode={extMode}&token={token}";
+            string url = $"{_url}{this.releaseID}?extended_mode={extMode}&token={token}";
             string html = await GetResponseAsync(url);
             return JsonConvert.DeserializeObject<Voices>(html); ;
            
         }
 
-        public async Task<VoicesId> GetVoiceID(string _url, string releaseID, string voice)
+        public async Task<VoicesId> GetVoiceID(string _url, string voice)
         {
 
-            string url = $"{_url}{releaseID}/{voice}";
+            string url = $"{_url}{this.releaseID}/{voice}";
             string html = await GetResponseAsync(url);
             return JsonConvert.DeserializeObject<VoicesId>(html);
 
         }
 
-        public async Task<string> GetSeriaLink(string _url, string releaseID, string voiceID, string seria)
+        public async Task<string> GetSeriaLink(string _url, string voiceID, string seria)
         {
 
 
-            string url = $"{_url}target/{releaseID}/{voiceID}/{seria}";
+            string url = $"{_url}target/{this.releaseID}/{voiceID}/{seria}";
             string html = await GetResponseAsync(url, true);
             GetKodikUrl kodikUrl = JsonConvert.DeserializeObject<GetKodikUrl>(html);
             string formattedText = "http://kodik.biz/api/video-links?p=56a768d08f43091901c44b54fe970049&link=" + kodikUrl.eepisode.url.Replace('?', '&').Remove(0, 6);
@@ -97,10 +144,10 @@ namespace testWpf.Core
             return formattedtext;
         }
 
-        public async Task<Series> GetSeries(string _url, string releaseID, string voice, string voiceID)
+        public async Task<Series> GetSeries(string _url, string voice, string voiceID)
         {
 
-            string url = $"{_url}{releaseID}/{voice}/{voiceID}";
+            string url = $"{_url}{this.releaseID}/{voice}/{voiceID}";
             string html = await GetResponseAsync(url);
             return JsonConvert.DeserializeObject<Series>(html);
 

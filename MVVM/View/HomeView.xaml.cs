@@ -33,9 +33,9 @@ namespace testWpf.MVVM.View
 
         private async void PickSerialAsync(object sender, MouseButtonEventArgs e)
         {
-            ResponseHandler response = new ResponseHandler();
-            await response.GetRelease("3333");
-            MainViewModel.Instance.CurrentView = new ReleaseViewModel();
+            
+            
+            MainViewModel.Instance.CurrentView = new ReleaseViewModel("3333");
             //object releaseViewContent = this.Resources["ReleaseViewContent"];
             //this.Content = releaseViewContent;
         }

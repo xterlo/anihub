@@ -26,11 +26,14 @@
         CornerRadius="10">
 
             <Border.Background>
-            <ImageBrush ImageSource="{Binding imageSourceLink}"/>
-        </Border.Background>
-
-
-    </Border>
+                <ImageBrush ImageSource="{Binding imageSourceLink}"/>
+            </Border.Background>
+        </Border>
+        <Border
+            
+            CornerRadius="10"
+            Visibility="{Binding TemplateImage}"
+            Background="{Binding AnimateTemplate}"/>
         <Label
             VerticalAlignment="Bottom"
             Grid.Row="1"

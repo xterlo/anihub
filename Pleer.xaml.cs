@@ -13,12 +13,10 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using LibVLCSharp.Shared;
 using testWpf.Core;
 using testWpf.MVVM.View;
 using testWpf.MVVM.ViewModel;
 using Vlc.DotNet.Wpf;
-using MediaPlayer = LibVLCSharp.Shared.MediaPlayer;
 
 namespace testWpf
 {

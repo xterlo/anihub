@@ -6,10 +6,12 @@
              xmlns:local="clr-namespace:testWpf.MVVM.View"
              xmlns:viewMode="clr-namespace:testWpf.MVVM.ViewModel"
              xmlns:core="clr-namespace:testWpf.Core" xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" d:DataContext="{d:DesignInstance Type=viewMode:ReleaseViewModel}"
+             xmlns:converters="clr-namespace:testWpf.MVVM.Converters"
              mc:Ignorable="d" 
              
              d:DesignHeight="5000" d:DesignWidth="1080"
-             Background="#282645"
+
+             Background="{DynamicResource backgroundColor}"
              
              >
     <!--<UserControl.DataContext>
@@ -24,7 +26,7 @@
 
                 <StackPanel Orientation="Horizontal"
                             MinHeight="300"
-                            MaxHeight="1000"
+                            
                             x:Name="firstBlockPreview"
                             >
                     <Canvas>
@@ -35,7 +37,7 @@
                             <Rectangle.Fill>
                                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                     <GradientStop Color="#00000000"/>
-                                    <GradientStop Color="#FF282645" Offset="0.92"/>
+                                    <GradientStop Color="#17191d" Offset="0.92"/>
                                 </LinearGradientBrush>
                             </Rectangle.Fill>
                         </Rectangle>
@@ -68,37 +70,99 @@
                             <ColumnDefinition Width="0.1*"/>
                         </Grid.ColumnDefinitions>
 
-                        <Grid Grid.Column="1" 
-                          MaxHeight="800"
-                          MaxWidth="1460"       
-                          SizeChanged="ImageResize"
+                        <Grid Grid.Column="1"
                           x:Name="previewContent">
 
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="1.5*"/>
-                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="0.4*" />
+                                <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <StackPanel 
-                        MinWidth="215"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center">
-                                <Border
-                                HorizontalAlignment="Center"
+                            <Grid                                
+                                Margin="0 100 0 0"
                                 VerticalAlignment="Center"
-                                Width="300"
-                                Height="400"
-                                MinHeight="266"
-                                MinWidth="200"
-                            x:Name="borderImage"
-                            CornerRadius="30">
+                                HorizontalAlignment="Center">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Grid.Resources>
+                                    <converters:ConvPicWidth x:Key="convPicWidth"/>
+                                    <converters:ConvPicHeight x:Key="convPicHeight"/>
+                                </Grid.Resources>
+                                <Border
+                                    Height="{Binding ElementName=grid, Path=ActualWidth, Converter={StaticResource convPicHeight}}"
+                                    Width="{Binding ElementName=grid, Path=ActualWidth, Converter={StaticResource convPicWidth}}"
+                                    x:Name="borderImage"
+                                    CornerRadius="30">
                                     <Border.Background>
                                         <ImageBrush 
-                                Stretch="UniformToFill"
-                                ImageSource="{Binding ReleasePoster}">
+                                            Stretch="UniformToFill"
+                                            ImageSource="{Binding ReleasePoster}">
                                         </ImageBrush>
                                     </Border.Background>
                                 </Border>
-                                <Grid 
+                                <Border
+                                    Height="{Binding ElementName=grid, Path=ActualWidth, Converter={StaticResource convPicHeight}}"
+                                    Width="{Binding ElementName=grid, Path=ActualWidth, Converter={StaticResource convPicWidth}}"
+                                    Visibility="{Binding TemplateImage}"
+                                    CornerRadius="30"
+                                    Background="{Binding AnimateTemplate}">
+
+                                </Border>
+                                <Border
+                                    Grid.Row="1"
+                                    Margin="0 10 0 0"
+                                    CornerRadius="30"
+                                    Background="{StaticResource modelColor}" >
+
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock 
+                                        Margin="10"
+                                        Text="Новая функция сомвестного просмотра "
+                                        Foreground="{StaticResource primaryTextColor}"
+                                        FontSize="16"
+                                        LineStackingStrategy="BlockLineHeight"
+                                        TextWrapping="WrapWithOverflow"
+                                        Padding="5"
+                                        FontFamily="/Fonts/#Monolog"/>
+                                        <TextBlock
+                                        Margin="10"
+                                        TextWrapping="WrapWithOverflow"
+                                        LineStackingStrategy="BlockLineHeight"
+                                        Grid.Row="1"
+                                        Foreground="{StaticResource secondaryTextColor}"
+                                        FontFamily="/Fonts/#Monolog"
+                                        Padding="5">
+                                        Возможность совместного использования<LineBreak/> 
+                                        экрана для совместного просмотра фильмов.<LineBreak/> 
+                                        Эту функцию могут использовать<LineBreak/> 
+                                        друзья, чтобы вместе смотреть видео, синхронизировать<LineBreak/> 
+                                        видео, позволяя пользователям общаться в чате.
+                                        </TextBlock>
+                                        <Button
+                                        Grid.Row="2"
+                                        HorizontalAlignment="Right"
+                                        Background="Transparent"
+                                        Foreground="{StaticResource pickedColor}"
+                                        Cursor="Hand"
+                                        Margin="0 25 25 10"
+                                        BorderThickness="0"
+                                        Content="Начать совместный просмотр"
+                                        Command="{Binding TogetherButtonClickCommand}">
+
+                                        </Button>
+                                    </Grid>
+
+                                </Border>
+                                <Grid
+                                    Grid.Row="2"
                                     Margin="0 15 0 0"
                                     HorizontalAlignment="Stretch">
                                     <Grid.ColumnDefinitions>
@@ -115,7 +179,7 @@
                                         HorizontalAlignment="Stretch">
 
                                     </ComboBox>
-                                    
+
                                     <ComboBox
                                         
                                         Grid.Column="1"
@@ -128,6 +192,7 @@
                                     </ComboBox>
                                 </Grid>
                                 <Button
+                                    Grid.Row="3"
                                     Background="#fdaf4b"
                                     Content="Смотреть"
                                     Foreground="Black"
@@ -143,59 +208,64 @@
                                         </Style>
                                     </Button.Resources>
                                 </Button>
-                                <!--<TextBox
-                                    Text="{Binding searchData,UpdateSourceTrigger=PropertyChanged}">
-                                    
-                                </TextBox>
-                                <Button
-                                    Background="Black"
-                                    Content="Совместный просмотр"
-                        Height="50"
-                        MaxWidth="250"
-                        MinWidth="130"
-                        Margin="0,20,0,0"
-                        HorizontalAlignment="Stretch"
-                        
-                        FontSize="20"
-                        Foreground="#d6d5d9"
-                        Command="{Binding TogetherButtonClickCommand}">
-                                </Button>-->
-                            </StackPanel>
-                            <StackPanel 
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Center"
-                        MaxWidth="1000" Grid.Column="1"
-                        Margin="0">
+                            </Grid>
+                            <Grid
+                                x:Name="TextBlocks"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                MaxWidth="1000" Grid.Column="1"
+                                Margin="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Grid.Resources>
+                                    <converters:ConvTitle x:Key="convTitle"/>
+                                    <converters:ConvDesc x:Key="convDesc"/>
+                                    <converters:ConvOrig x:Key="convOrig"/>
+                                </Grid.Resources>
                                 <TextBlock
-                            
-                            x:Name="releaseName"
-                        Padding="25,0,25,0"
-                        FontSize="40"
-                        Foreground="#d6d5d9"
-                        FontWeight="Bold"
-                        FontFamily="/Fonts/#Monolog"
-                        Text="{Binding ReleaseName}"/>
+                                    x:Name="releaseName"
+                                    Padding="25,0,25,0"
+                                    FontSize="{Binding ElementName=grid, Path=ActualWidth, Converter={StaticResource convTitle}}"
+                                    Foreground="#d6d5d9"
+                                    FontWeight="Bold"
+                                    FontFamily="/Fonts/#Monolog"
+                                    Text="{Binding ReleaseName}">
+                                    <TextBlock.ToolTip>
+                                        <ToolTip Background="{DynamicResource modelColor}">
+                                            <TextBlock Margin="3" Foreground="{StaticResource primaryTextColor}" Text="{Binding ReleaseName}"></TextBlock>
+                                        </ToolTip>
+                                    </TextBlock.ToolTip>
+                                </TextBlock>
                                 <TextBlock
-                                Padding="25,0,25,0"
-                            x:Name="releaseOriginalName"
-                        FontSize="23"
-                        Foreground="Gray"
-                        FontWeight="Medium"
-                        FontFamily="/Fonts/#Monolog"
-                        Text="{Binding ReleaseOriginalName}"/>
+                                    Padding="25,0,25,0"
+                                    Grid.Row="1"
+                                    x:Name="releaseOriginalName"
+                                    FontSize="{Binding ElementName=grid, Path=ActualWidth, Converter={StaticResource convOrig}}"
+                                    Foreground="Gray"
+                                    FontWeight="Medium"
+                                    FontFamily="/Fonts/#Monolog"
+                                    Text="{Binding ReleaseOriginalName}">
+                                    <TextBlock.ToolTip>
+                                        <ToolTip Background="{DynamicResource modelColor}">
+                                            <TextBlock Margin="3" Foreground="{StaticResource primaryTextColor}" Text="{Binding ReleaseOriginalName}"></TextBlock>
+                                        </ToolTip>
+                                    </TextBlock.ToolTip>
+                                </TextBlock>
                                 <TextBlock
-                                
-                                Padding="25,0,25,0"
-                            x:Name="releaseDescription"
-                        FontSize="20"
-                        FontWeight="Medium"
-                        Foreground="#d6d5d9"
-                        FontFamily="/Fonts/#Monolog"
-                        TextWrapping="WrapWithOverflow"
-                        Text="{Binding ReleaseDescription}"
-                        LineStackingStrategy="BlockLineHeight"/>
-                                
-                            </StackPanel>
+                                    Grid.Row="2"
+                                    Padding="25,0,25,0"
+                                    x:Name="releaseDescription"
+                                    FontSize="{Binding ElementName=grid, Path=ActualWidth, Converter={StaticResource convDesc}}"
+                                    FontWeight="Medium"
+                                    Foreground="#d6d5d9"
+                                    FontFamily="/Fonts/#Monolog"
+                                    TextWrapping="WrapWithOverflow"
+                                    Text="{Binding ReleaseDescription}"
+                                    LineStackingStrategy="BlockLineHeight"/>
+                            </Grid>
                         </Grid>
                     </Grid>
                 </StackPanel>

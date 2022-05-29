@@ -7,6 +7,7 @@
         xmlns:local="clr-namespace:testWpf.MVVM.View"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         mc:Ignorable="d"
+        xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
         Title="MainWindow" Height="450" Width="800" 
         MinWidth="770" MinHeight="400"
         d:Width="1000"
@@ -21,27 +22,28 @@
     </Window.DataContext>
 
     <Border CornerRadius="10"
-            Background="#FF563573">
+            Background="{StaticResource backgroundColor}">
+        
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="15"/>
                 <RowDefinition />
             </Grid.RowDefinitions>
-            <Grid 
-                MouseLeftButtonDown="MoveMainWindow" Panel.ZIndex="1000000">
+            <Grid
+                MouseLeftButtonDown="MoveMainWindow"
+                Panel.ZIndex="1000000">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition Width="75"/>
                 </Grid.ColumnDefinitions>
                 <Border Grid.Column="0"
+                        Background="{StaticResource backgroundColor}"
                         CornerRadius="10 0 0 0"
-                        Background="#241f3d"
                         >
 
                 </Border>
                 <Grid Grid.Column="1"
-                      HorizontalAlignment="Right"
-                      Background="Transparent">
+                      HorizontalAlignment="Right">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="25"/>
                         <ColumnDefinition Width="25"/>
@@ -50,19 +52,16 @@
                     <Button
                     BorderThickness="0"
                         Click="MinimizeWindow"
-                        Background="#c2c2"
                         Style="{StaticResource minimizeControlButton}">
 
                     </Button>
                     <Button
-                    Background="#FF241f3d"
                     BorderThickness="0"
                     Grid.Column="1"
                     Click="MaximizeWindow"
                     Style="{StaticResource fullscreenControlButton}">
                     </Button>
                     <Button
-                    Background="#FF241f3d"
                     BorderThickness="0"
                     MinWidth="25"
                     Grid.Column="2"
@@ -70,7 +69,10 @@
                     </Button>
                 </Grid>
             </Grid>
-            <Grid Grid.Row="1" VerticalAlignment="Stretch">
+            <Grid 
+                Opacity="{Binding OpacityWindow}"
+                IsEnabled="{Binding IsEnabledMainWindow}"
+                Grid.Row="1" VerticalAlignment="Stretch">
                 <Grid.RowDefinitions>
                     <RowDefinition/>
 
@@ -83,7 +85,7 @@
                   x:Name="leftBar" x:FieldModifier="public" 
                   Width="250"
                   HorizontalAlignment="Left" 
-                  Background="#FF241f3d"
+                  Background="{StaticResource backgroundColor}"
                   MouseEnter="leftBar_MouseEnter" 
                   MouseLeave="leftBar_MouseLeave" Panel.ZIndex="1000">
                     <Grid.RowDefinitions>
@@ -91,7 +93,7 @@
                         <RowDefinition/>
                         <RowDefinition Height="0.1*"/>
                     </Grid.RowDefinitions>
-                    <Border  Background="#FF241f3d" >
+                    <Border   >
                         <Label Content="ANIMEXART"
                        Foreground="White"
                        FontFamily="/Fonts/#Monolog"
@@ -115,27 +117,123 @@
                                 FontSize="22"></Label>
                             <Border
                                 Style="{StaticResource NavBarBorderStyle}">
-                                <RadioButton
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseDown">
+                                        <i:InvokeCommandAction Command="{Binding testNewFicha}"                                                                                                                                      
+                                                CommandParameter="{Binding  
+                                                RelativeSource={RelativeSource FindAncestor, 
+                                                AncestorType={x:Type Border}}}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="0.2*"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Path
+                                        Data="{StaticResource homeSvg}"
+                                        Width="20"
+                                        Height="20"
+                                        Stretch="Uniform"
+                                        Stroke="{StaticResource primaryTextColor}"/>
+                                    <RadioButton Grid.Column="1"
+                                                 
                                 Content="Главная"
                                 IsChecked="True"
-                                Style="{StaticResource MenuButtonTheme}"
-                                Command="{Binding _homeViewCommand}">
-                                </RadioButton>
+                                IsEnabled="False"
+                                Style="{StaticResource MenuButtonTheme}" >
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="Checked">
+                                                <i:InvokeCommandAction Command="{Binding _homeViewCommand}"/>
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="Unchecked">
+                                                <i:InvokeCommandAction Command="{Binding _unchecked}" 
+                                                CommandParameter="{Binding  
+                                                RelativeSource={RelativeSource FindAncestor, 
+                                                AncestorType={x:Type RadioButton}}}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </RadioButton>
+                                </Grid>
                             </Border>
                             <Border
                                 Style="{StaticResource NavBarBorderStyle}">
-                                <RadioButton
-                                Content="Обзор"    
-                                Style="{StaticResource MenuButtonTheme}"
-                                Command="{Binding _discoveryViewCommand}"></RadioButton>
-                            </Border>
-                            <Border
-                                Style="{StaticResource NavBarBorderStyle}">
-                                <RadioButton 
-                                Content="Настройки"
-                                Style="{StaticResource MenuButtonTheme}"
-                                Command="{Binding ReleaseViewCommand}"></RadioButton>
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseDown">
+                                        <i:InvokeCommandAction Command="{Binding testNewFicha}"                                                                                                                                      
+                                                CommandParameter="{Binding  
+                                                RelativeSource={RelativeSource FindAncestor, 
+                                                AncestorType={x:Type Border}}}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="0.2*"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
 
+                                    <Path 
+                                        Stretch="Fill"
+                                        Width="20"
+                                        Height="20"
+                                        Stroke="{StaticResource primaryTextColor}"
+                                        Data="{StaticResource discoverySvg}"/>
+                                    <RadioButton Grid.Column="1"
+                                Content="Обзор"    
+                                Style="{StaticResource MenuButtonTheme}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="Checked">
+                                                <i:InvokeCommandAction Command="{Binding _discoveryViewCommand}"/>
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="Unchecked">
+                                                <i:InvokeCommandAction Command="{Binding _unchecked}" 
+                                                CommandParameter="{Binding  
+                                                RelativeSource={RelativeSource FindAncestor, 
+                                                AncestorType={x:Type RadioButton}}}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </RadioButton>
+                                </Grid>
+                            </Border>
+                            <Border
+                                Style="{StaticResource NavBarBorderStyle}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseDown">
+                                        <i:InvokeCommandAction Command="{Binding testNewFicha}"                                                                                                                                      
+                                                CommandParameter="{Binding  
+                                                RelativeSource={RelativeSource FindAncestor, 
+                                                AncestorType={x:Type Border}}}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="0.2*"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Path
+                                        Data="{StaticResource settingSvg}"
+                                        Width="20"
+                                        Height="20"
+                                        Stretch="Uniform"
+                                        Stroke="{StaticResource primaryTextColor}"/>
+                                    <RadioButton Grid.Column="1" 
+                                Content="Настройки"
+                                Style="{StaticResource MenuButtonTheme}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="Checked">
+                                                <i:InvokeCommandAction Command="{Binding ReleaseViewCommand}"/>
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="Unchecked">
+                                                <i:InvokeCommandAction Command="{Binding _unchecked}" 
+                                                CommandParameter="{Binding  
+                                                RelativeSource={RelativeSource FindAncestor, 
+                                                AncestorType={x:Type RadioButton}}}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </RadioButton>
+                                </Grid>
                             </Border>
                         </StackPanel>
                         <StackPanel
@@ -150,26 +248,123 @@
                                 FontSize="22"></Label>
                             <Border
                                 Style="{StaticResource NavBarBorderStyle}">
-                            <RadioButton
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseDown">
+                                        <i:InvokeCommandAction Command="{Binding testNewFicha}"                                                                                                                                      
+                                                CommandParameter="{Binding  
+                                                RelativeSource={RelativeSource FindAncestor, 
+                                                AncestorType={x:Type Border}}}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="0.2*"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Path
+                                        Data="{StaticResource folderSvg}"
+                                        Width="20"
+                                        Height="20"
+                                        Stretch="Uniform"
+                                        Stroke="{StaticResource primaryTextColor}"/>
+                                    <RadioButton Grid.Column="1"
                                 Content="Библиотека"
                                 Style="{StaticResource MenuButtonTheme}"
                                 Command="{Binding HomeViewCommand}">
-                            </RadioButton>
-
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="Checked">
+                                                <i:InvokeCommandAction Command="{Binding ReleaseViewCommand}"/>
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="Unchecked">
+                                                <i:InvokeCommandAction Command="{Binding _unchecked}" 
+                                                CommandParameter="{Binding  
+                                                RelativeSource={RelativeSource FindAncestor, 
+                                                AncestorType={x:Type RadioButton}}}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </RadioButton>
+                                </Grid>
                             </Border>
                             <Border
                                 Style="{StaticResource NavBarBorderStyle}">
-                                <RadioButton
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseDown">
+                                        <i:InvokeCommandAction Command="{Binding testNewFicha}"                                                                                                                                      
+                                                CommandParameter="{Binding  
+                                                RelativeSource={RelativeSource FindAncestor, 
+                                                AncestorType={x:Type Border}}}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="0.2*"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Path
+                                        Data="{StaticResource collectionSvg}"
+                                        Width="20"
+                                        Height="20"
+                                        Stretch="Uniform"
+                                        Stroke="{StaticResource primaryTextColor}"/>
+                                    <RadioButton Grid.Column="1"
                                 Content="Моя коллекция"
                                 Style="{StaticResource MenuButtonTheme}"
-                                Command="{Binding DiscoveryViewCommand}"></RadioButton>
+                                Command="{Binding DiscoveryViewCommand}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="Checked">
+                                                <i:InvokeCommandAction Command="{Binding ReleaseViewCommand}"/>
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="Unchecked">
+                                                <i:InvokeCommandAction Command="{Binding _unchecked}" 
+                                                CommandParameter="{Binding  
+                                                RelativeSource={RelativeSource FindAncestor, 
+                                                AncestorType={x:Type RadioButton}}}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </RadioButton>
+                                </Grid>
                             </Border>
                             <Border
                                Style="{StaticResource NavBarBorderStyle}">
-                            <RadioButton 
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseDown">
+                                        <i:InvokeCommandAction Command="{Binding testNewFicha}"                                                                                                                                      
+                                                CommandParameter="{Binding  
+                                                RelativeSource={RelativeSource FindAncestor, 
+                                                AncestorType={x:Type Border}}}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="0.2*"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Path
+                                        Data="{StaticResource downloadSvg}"
+                                        Width="20"
+                                        Height="20"
+                                        Stretch="Uniform"
+                                        Stroke="{StaticResource primaryTextColor}"/>
+                                    <RadioButton Grid.Column="1" 
                                 Content="Скачанное"
                                 Style="{StaticResource MenuButtonTheme}"
-                                Command="{Binding ReleaseViewCommand}"></RadioButton>
+                                Command="{Binding ReleaseViewCommand}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="Checked">
+                                                <i:InvokeCommandAction Command="{Binding ReleaseViewCommand}"/>
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="Unchecked">
+                                                <i:InvokeCommandAction Command="{Binding _unchecked}" 
+                                                CommandParameter="{Binding  
+                                                RelativeSource={RelativeSource FindAncestor, 
+                                                AncestorType={x:Type RadioButton}}}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </RadioButton>
+                                </Grid>
                             </Border>
                         </StackPanel>
 
@@ -178,6 +373,7 @@
                             Height="25"
                             FontFamily="/Fonts/#Monolog"
                             VerticalAlignment="Bottom"
+                            Command="{Binding _showPickWtg}"
                                 Content="Создать комнату">
                     </Button>
                 </Grid>
@@ -230,7 +426,62 @@
 
                 </Grid>
             </Grid>
-
+            <Border
+                Visibility="{Binding VisibilityWtg}"
+                Grid.Row="1"
+                Width="350"
+                Height="150"
+                Background="{StaticResource backgroundColor}"
+                CornerRadius="20"
+                BorderThickness="2"
+                BorderBrush="{StaticResource secondaryTextColor}">
+                <Grid
+                    >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height=".1*"/>
+                        <RowDefinition Height=".12*"/>
+                        <RowDefinition Height=".15*"/>
+                        <RowDefinition Height=".2*"/>
+                    </Grid.RowDefinitions>
+                    <Button 
+                        Width="25"
+                        Style="{StaticResource closeButtonPleer}"
+                        HorizontalAlignment="Right"
+                        Content="X"
+                        Foreground="{StaticResource primaryTextColor}"
+                        Background="{StaticResource modelColor}"
+                        Command="{Binding _hidePickWtg}"
+                        Margin=" 0 0 20 0"
+                        BorderThickness="0">
+                    </Button>
+                    <Label
+                        Grid.Row="1"
+                        Content="Введите ссылку на комнату:"
+                        Foreground="{StaticResource primaryTextColor}"
+                        FontFamily="/Fonts/#Monolog"/>
+                    <TextBox
+                        Grid.Row="2"
+                        Margin="15 5 15 5"
+                        HorizontalContentAlignment="Left"
+                        VerticalContentAlignment="Center"
+                        Padding="3 0 0 0"
+                        Text="{Binding Roomid,UpdateSourceTrigger=PropertyChanged}"
+                        FontFamily="/Fonts/#Monolog"/>
+                    <Button
+                        Grid.Row="3"
+                        Content="Войти в комнату"
+                        Margin="10"
+                        Background="{StaticResource pickedColor}"
+                        Command="{Binding _connectToRoom}">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="10"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </Grid>
+                
+            </Border>
         </Grid>
 
     </Border>

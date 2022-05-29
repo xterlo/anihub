@@ -97,7 +97,7 @@ namespace testWpf.Core
         }
         public string GetPoster()
         {
-            return result.poster;
+            return $@"https://static.anixart.tv/posters/{result.poster}.jpg";
         }
         public void SetPoster(string param)
         {

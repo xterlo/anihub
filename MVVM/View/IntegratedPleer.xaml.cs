@@ -1,5 +1,4 @@
-﻿using LibVLCSharp.Shared;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -441,8 +440,8 @@ namespace testWpf.MVVM.View
                 case "episode":
                     if (VideoView.IsLoaded)
                     {
-                        ResponseHandler resp = new ResponseHandler();
-                        string kodikUrl = await resp.GetSeriaLink(resp.getEpisodesUrl, TemplatePreferens.releaseInfo.GetId().ToString(), properties.voicesId, properties.episode.ToString());
+                        ResponseHandler resp = new ResponseHandler(TemplatePreferens.releaseInfo.GetId().ToString());
+                        string kodikUrl = await resp.GetSeriaLink(resp.getEpisodesUrl, properties.voicesId, properties.episode.ToString());
                         properties.urlvideo = await resp.GetVideoUrl(kodikUrl);
                         StartVideo(true);
                     }
@@ -658,55 +657,66 @@ namespace testWpf.MVVM.View
         {
             Height = (ActualWidth * 9) / 16;
         }
-
+        private Point _lastMove;
         private async void hideControls(object sender, MouseEventArgs e)
         {
             if (sender == controlsGrid) ThreadControlsHidden?.Abort();
             else
             {
-                var cildren = controlsGrid.Children;
-                foreach (object c in cildren)
+                var p = e.GetPosition((IInputElement)sender);
+                if (_lastMove != p)
                 {
-                    if (c is Label) (c as Label).Visibility = Visibility.Visible;
-                    if (c is Button) (c as Button).Visibility = Visibility.Visible;
-                    if (c is Canvas) (c as Canvas).Visibility = Visibility.Visible;
-                    if (c is Rectangle) (c as Rectangle).Visibility = Visibility.Visible;
-                    if (c is Slider) (c as Slider).Visibility = Visibility.Visible;
-                    this.Cursor = Cursors.Arrow;
-                    animeName.Visibility = Visibility.Visible;
-                }
-                nextEpisodeBut.Visibility = Visibility.Visible;
-                prevEpisodeBut.Visibility = Visibility.Visible;
-                closeButton.Visibility = Visibility.Visible;
-                ThreadControlsHidden?.Abort();
-                ThreadControlsHidden = new Thread(checkControls);
-                
-                ThreadControlsHidden.Start();
-                await Task.Delay(2000);
-                //bool check = await checkControls(isControlsHidden);
-                if (isControlsHidden)
-                {
+                    Console.WriteLine("TEST REALY");
+                    Console.WriteLine(isControlsHidden);
+                    var cildren = controlsGrid.Children;
                     foreach (object c in cildren)
                     {
-                        isControlsHidden = false;
-                        animeName.Visibility = Visibility.Hidden;
-                        if (c is Label) (c as Label).Visibility = Visibility.Hidden;
-                        if (c is Button) (c as Button).Visibility = Visibility.Hidden;
-                        if (c is Canvas) (c as Canvas).Visibility = Visibility.Hidden;
-                        if (c is Rectangle) (c as Rectangle).Visibility = Visibility.Hidden;
+                        if (c is Label) (c as Label).Visibility = Visibility.Visible;
+                        if (c is Button) (c as Button).Visibility = Visibility.Visible;
+                        if (c is Canvas) (c as Canvas).Visibility = Visibility.Visible;
+                        if (c is Rectangle) (c as Rectangle).Visibility = Visibility.Visible;
                         if (c is Slider) (c as Slider).Visibility = Visibility.Visible;
-                        this.Cursor = Cursors.None;
+                        this.Cursor = Cursors.Arrow;
+                        animeName.Visibility = Visibility.Visible;
                     }
-                    nextEpisodeBut.Visibility = Visibility.Hidden;
-                    prevEpisodeBut.Visibility = Visibility.Hidden;
-                    closeButton.Visibility = Visibility.Hidden;
+                    nextEpisodeBut.Visibility = Visibility.Visible;
+                    prevEpisodeBut.Visibility = Visibility.Visible;
+                    closeButton.Visibility = Visibility.Visible;
+
+                    ThreadControlsHidden = new Thread(checkControls);
+
+                    ThreadControlsHidden.Start();
+                    await Task.Delay(2000);
+                    //bool check = await checkControls(isControlsHidden);
+
+                    if (isControlsHidden)
+                    {
+                        isControlsHidden = false;
+
+                        foreach (object c in cildren)
+                        {
+
+                            animeName.Visibility = Visibility.Hidden;
+                            if (c is Label) (c as Label).Visibility = Visibility.Hidden;
+                            if (c is Button) (c as Button).Visibility = Visibility.Hidden;
+                            if (c is Canvas) (c as Canvas).Visibility = Visibility.Hidden;
+                            if (c is Rectangle) (c as Rectangle).Visibility = Visibility.Hidden;
+                            if (c is Slider) (c as Slider).Visibility = Visibility.Hidden;
+                            this.Cursor = Cursors.None;
+                        }
+                        nextEpisodeBut.Visibility = Visibility.Hidden;
+                        prevEpisodeBut.Visibility = Visibility.Hidden;
+                        closeButton.Visibility = Visibility.Hidden;
+                    }
+                    _lastMove = p;
                 }
             }
         }
 
-        private async void checkControls()
+        private void checkControls()
         {
             Thread.Sleep(1500);
+
             isControlsHidden = true;
         }
 

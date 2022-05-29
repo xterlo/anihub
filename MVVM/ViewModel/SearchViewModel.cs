@@ -82,11 +82,9 @@ namespace testWpf.MVVM.ViewModel
         }
 
 
-        public async void pickAnime()
+        public void pickAnime()
         {
-            ResponseHandler response = new ResponseHandler();
-            await response.GetRelease(id);
-            MainViewModel.Instance.CurrentView = new ReleaseViewModel();
+            MainViewModel.Instance.CurrentView = new ReleaseViewModel(id);
         }
 
         public void OnPropertyChanged(string name)

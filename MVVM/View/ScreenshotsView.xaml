@@ -21,5 +21,10 @@
                 <ImageBrush ImageSource="{Binding imageSourceLink}"/>
             </Border.Background>
         </Border>
+        <Border
+            Visibility="{Binding TemplateImage}"
+            CornerRadius="10"
+            Margin="10,20,0,20"
+            Background="{Binding AnimateTemplate}"/>
     </Grid>
 </UserControl>
