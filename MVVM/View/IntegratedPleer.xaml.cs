@@ -663,11 +663,10 @@ namespace testWpf.MVVM.View
             if (sender == controlsGrid) ThreadControlsHidden?.Abort();
             else
             {
+                Console.WriteLine(sender);
                 var p = e.GetPosition((IInputElement)sender);
                 if (_lastMove != p)
                 {
-                    Console.WriteLine("TEST REALY");
-                    Console.WriteLine(isControlsHidden);
                     var cildren = controlsGrid.Children;
                     foreach (object c in cildren)
                     {
@@ -689,7 +688,7 @@ namespace testWpf.MVVM.View
                     await Task.Delay(2000);
                     //bool check = await checkControls(isControlsHidden);
 
-                    if (isControlsHidden)
+                    if (isControlsHidden && sender != controlsGrid)
                     {
                         isControlsHidden = false;
 
@@ -716,7 +715,6 @@ namespace testWpf.MVVM.View
         private void checkControls()
         {
             Thread.Sleep(1500);
-
             isControlsHidden = true;
         }
 

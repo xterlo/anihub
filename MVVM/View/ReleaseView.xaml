@@ -70,27 +70,24 @@
                             <ColumnDefinition Width="0.1*"/>
                         </Grid.ColumnDefinitions>
 
+
                         <Grid Grid.Column="1"
+                          Margin="0 100 0 0" 
                           x:Name="previewContent">
 
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="0.4*" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <Grid                                
-                                Margin="0 100 0 0"
-                                VerticalAlignment="Center"
-                                HorizontalAlignment="Center">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <Grid.Resources>
-                                    <converters:ConvPicWidth x:Key="convPicWidth"/>
-                                    <converters:ConvPicHeight x:Key="convPicHeight"/>
-                                </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.Resources>
+                                <converters:ConvPicWidth x:Key="convPicWidth"/>
+                                <converters:ConvPicHeight x:Key="convPicHeight"/>
+                            </Grid.Resources>
+                            <Grid>
                                 <Border
                                     Height="{Binding ElementName=grid, Path=ActualWidth, Converter={StaticResource convPicHeight}}"
                                     Width="{Binding ElementName=grid, Path=ActualWidth, Converter={StaticResource convPicWidth}}"
@@ -111,8 +108,20 @@
                                     Background="{Binding AnimateTemplate}">
 
                                 </Border>
+                            </Grid>
+                            <Grid 
+                                Width="{Binding ElementName=borderImage, Path=ActualWidth}"
+                                Grid.Row="1"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+
                                 <Border
-                                    Grid.Row="1"
                                     Margin="0 10 0 0"
                                     CornerRadius="30"
                                     Background="{StaticResource modelColor}" >
@@ -162,7 +171,7 @@
 
                                 </Border>
                                 <Grid
-                                    Grid.Row="2"
+                                    Grid.Row="1"
                                     Margin="0 15 0 0"
                                     HorizontalAlignment="Stretch">
                                     <Grid.ColumnDefinitions>
@@ -183,6 +192,8 @@
                                     <ComboBox
                                         
                                         Grid.Column="1"
+                                        IsEnabled="{Binding isEnabledEpisode}"
+                                        Opacity="{Binding opacityEpisode}"
                                         ItemsSource="{Binding comboboxEpisodesData}"
                                         SelectedItem="{Binding SelectedEpisodeItem}"
                                         x:Name="seriesComboBox"
@@ -192,7 +203,7 @@
                                     </ComboBox>
                                 </Grid>
                                 <Button
-                                    Grid.Row="3"
+                                    Grid.Row="2"
                                     Background="#fdaf4b"
                                     Content="Смотреть"
                                     Foreground="Black"
@@ -210,6 +221,7 @@
                                 </Button>
                             </Grid>
                             <Grid
+                                
                                 x:Name="TextBlocks"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
@@ -224,6 +236,9 @@
                                     <converters:ConvTitle x:Key="convTitle"/>
                                     <converters:ConvDesc x:Key="convDesc"/>
                                     <converters:ConvOrig x:Key="convOrig"/>
+                                    <converters:ConvOrig x:Key="convTitleTemplate"/>
+                                    <converters:ConvOrig x:Key="convDescTemplate"/>
+                                    <converters:ConvOrig x:Key="convOrigTemplate"/>
                                 </Grid.Resources>
                                 <TextBlock
                                     x:Name="releaseName"
@@ -239,6 +254,13 @@
                                         </ToolTip>
                                     </TextBlock.ToolTip>
                                 </TextBlock>
+                                <Border
+                                    Height="100"
+                                    Width="500"
+                                    Margin="5"
+                                    Visibility="{Binding TemplateReleaseText}"
+                                    CornerRadius="15"
+                                    Background="{Binding AnimateTemplate}"/>
                                 <TextBlock
                                     Padding="25,0,25,0"
                                     Grid.Row="1"
@@ -254,6 +276,14 @@
                                         </ToolTip>
                                     </TextBlock.ToolTip>
                                 </TextBlock>
+                                <Border
+                                    Grid.Row="1"
+                                    Margin="5"
+                                    Height="50"
+                                    Width="500"
+                                    Visibility="{Binding TemplateReleaseText}"
+                                    CornerRadius="7"
+                                    Background="{Binding AnimateTemplate}"/>
                                 <TextBlock
                                     Grid.Row="2"
                                     Padding="25,0,25,0"
@@ -265,6 +295,14 @@
                                     TextWrapping="WrapWithOverflow"
                                     Text="{Binding ReleaseDescription}"
                                     LineStackingStrategy="BlockLineHeight"/>
+                                <Border
+                                    Grid.Row="2"
+                                    Margin="5"
+                                    Height="150"
+                                    Width="500"
+                                    Visibility="{Binding TemplateReleaseText}"
+                                    CornerRadius="10"
+                                    Background="{Binding AnimateTemplate}"/>
                             </Grid>
                         </Grid>
                     </Grid>

@@ -12,9 +12,10 @@
         <!--<uc:VlcControl 
             Background="Black"
             x:Name="VideoView" Panel.ZIndex="-1" SizeChanged="VideoNormalizer">-->
+        
         <Grid>
             <ContentControl 
-                    Panel.ZIndex="-1"
+                    Panel.ZIndex="-100000"
                     Name="ControlContainer">
             </ContentControl>
             <Button
