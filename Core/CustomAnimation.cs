@@ -115,6 +115,36 @@ namespace testWpf.Core
                 }
             }
         }
+        public async Task SvgAnimation(Func<double, double> animFormula, int dur, string[] needData, bool reverse = false)
+        {
+            long start = UnixTimeNow();
+            duraion = dur;
+            double progress = 0;
+            if (!isStarted)
+            {
+                while (progress >= 0)
+                {
+                    progress = await Task.Run(() => Animate(animFormula, duraion, start));
+                    if (progress != -1)
+                    {
+                        Path obj = animationObject as Path;
+                        if (!reverse)
+                        {
+                            obj.Data = Geometry.Parse(needData[Math.Abs((int)(progress * needData.Length))]);
+                        }
+                        if (reverse)
+                        {
+                            obj.Data = Geometry.Parse(needData[Math.Abs((int)((needData.Length) - (progress * needData.Length)))]);
+                        }
+                        isStarted = true;
+                    }
+                    else
+                    {
+                        isStarted = false;
+                    }
+                }
+            }
+        }
 
         public async Task SvgAnimation(Func<double, double> animFormula, int dur,  Color minFill, Color maxFill, Color minStroke, Color maxStroke, bool reverse = false)
         {
