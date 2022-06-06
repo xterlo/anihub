@@ -110,7 +110,7 @@ namespace testWpf.MVVM.ViewModel
             LGB.GradientStops.Add(new GradientStop(Color.FromArgb(255, 34, 34, 42), pos));
             AnimateTemplate = LGB;
             stepLinearGradient += 1;
-            Console.WriteLine("ANIMATE");
+            
         }
         private async void setPoster(string url)
         {

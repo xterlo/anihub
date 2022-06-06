@@ -13,6 +13,7 @@ namespace testWpf.MVVM.Converters
     {
     }
 
+    #region FONTS
     [ValueConversion(typeof(double), typeof(double))]
     class ConvTitle : IValueConverter
     {
@@ -69,7 +70,70 @@ namespace testWpf.MVVM.Converters
             throw new NotImplementedException();
         }
     }
+    #endregion
 
+    #region TEMPLATES
+
+    class ConvTitleTemplate : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            // here you can use the parameter that you can give in here via setting , ConverterParameter='something'} or use any nice login with the VisualTreeHelper to make a better return value, or maybe even just hardcode some max values if you like
+            var maxWidth = SystemParameters.PrimaryScreenWidth;
+            var width = (double)value;
+            var widthNormaliz = (width - 520) / ((maxWidth - 250) - 520);
+            var TemplateSize = ((500 - 150) * widthNormaliz) + 150;
+            return TemplateSize;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+
+
+    class ConvDescTemplate : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            // here you can use the parameter that you can give in here via setting , ConverterParameter='something'} or use any nice login with the VisualTreeHelper to make a better return value, or maybe even just hardcode some max values if you like
+            var maxWidth = SystemParameters.PrimaryScreenWidth;
+            var width = (double)value;
+            var widthNormaliz = (width - 520) / ((maxWidth - 250) - 520);
+            var TemplateSize = ((300 - 100) * widthNormaliz) + 100;
+            return TemplateSize;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    class ConvOrigTemplate : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            // here you can use the parameter that you can give in here via setting , ConverterParameter='something'} or use any nice login with the VisualTreeHelper to make a better return value, or maybe even just hardcode some max values if you like
+            var maxWidth = SystemParameters.PrimaryScreenWidth;
+            var width = (double)value;
+            var widthNormaliz = (width - 520) / ((maxWidth - 250) - 520);
+            var TemplateSize = ((500 - 150) * widthNormaliz) + 150;
+            return TemplateSize;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+
+    #endregion
+
+    #region PIC
     class ConvPicWidth : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -106,4 +170,5 @@ namespace testWpf.MVVM.Converters
             throw new NotImplementedException();
         }
     }
+    #endregion
 }

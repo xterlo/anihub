@@ -24,6 +24,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using testWpf.Core;
 using testWpf.MVVM.View;
+using YoutubeExplode;
+using YoutubeExplode.Videos.Streams;
 using static testWpf.Core.Series;
 using static testWpf.Core.Voices;
 using Color = System.Windows.Media.Color;
@@ -244,14 +246,18 @@ namespace testWpf.MVVM.ViewModel
         public ObservableCollection<string> comboboxVoicesData
         {
             get { return _comboboxVoicesData; }
-            set { _comboboxVoicesData = value; }
+            set { _comboboxVoicesData = value;
+                OnPropertyChanged(nameof(comboboxVoicesData));
+            }
         }
 
         private ObservableCollection<string> _comboboxEpisodesData;
         public ObservableCollection<string> comboboxEpisodesData
         {
             get { return _comboboxEpisodesData; }
-            set { _comboboxEpisodesData = value; }
+            set { _comboboxEpisodesData = value;
+                OnPropertyChanged(nameof(comboboxEpisodesData));
+            }
         }
         private string _selectedVoiceItem;
         public string SelectedVoiceItem
@@ -335,7 +341,6 @@ namespace testWpf.MVVM.ViewModel
         public void resizeX(double width)
         {
             ImageBlockWidth = width;
-            Console.WriteLine($"RESIZE X {width}");
         }
 
         public void resizeY(double height)
@@ -348,6 +353,32 @@ namespace testWpf.MVVM.ViewModel
 
         #region UI SETTINGS
 
+        private bool _isEnabledEpisode = false;
+        public bool isEnabledEpisode
+        {
+            get { return _isEnabledEpisode; }
+            set
+            {
+                _isEnabledEpisode = value;
+                if (value)
+                    opacityEpisode = 1f;
+                else
+                    opacityEpisode = .5f;
+                OnPropertyChanged(nameof(isEnabledEpisode));
+            }
+        }
+
+        private float _opacityEpisode = .5f;
+        public float opacityEpisode
+        {
+            get { return _opacityEpisode; }
+            set
+            {
+                _opacityEpisode = value;
+                OnPropertyChanged(nameof(opacityEpisode));
+            }
+        }
+
         private Visibility _templateImage = Visibility.Visible;
         public Visibility TemplateImage
         {
@@ -355,6 +386,17 @@ namespace testWpf.MVVM.ViewModel
             set { 
                 _templateImage = value;
                 OnPropertyChanged(nameof(TemplateImage));
+            }
+        }
+
+        private Visibility _templateReleaseText = Visibility.Visible;
+        public Visibility TemplateReleaseText
+        {
+            get { return _templateReleaseText; }
+            set
+            {
+                _templateReleaseText = value;
+                OnPropertyChanged(nameof(TemplateReleaseText));
             }
         }
 
@@ -378,6 +420,8 @@ namespace testWpf.MVVM.ViewModel
         public ReleaseViewModel(string releaseID)
         {
             Instance = this;
+            WatchButtonClickCommand = new RelayCommand<object>(WatchButtonClick);
+            TogetherButtonClickCommand = new RelayCommand<object>(TogetherButtonClick);
             resp = new ResponseHandler(releaseID);
             resp.endGetRelease += Initialization;
             _timer.Interval = TimeSpan.FromMilliseconds(20);
@@ -396,9 +440,6 @@ namespace testWpf.MVVM.ViewModel
         }
         public async void Initialization()
         {
-            
-            WatchButtonClickCommand = new RelayCommand<object>(WatchButtonClick);
-            TogetherButtonClickCommand = new RelayCommand<object>(TogetherButtonClick);
             comboboxVoicesData = new ObservableCollection<string>();
             comboboxEpisodesData = new ObservableCollection<string>();
             relatedReleaseModel = new ObservableCollection<RelatedReleaseModel>();
@@ -408,40 +449,20 @@ namespace testWpf.MVVM.ViewModel
             ReleaseName = releaseInfo.GetTitleRu();
             ReleaseOriginalName = releaseInfo.GetTitleOriginal();
             ReleaseDescription = releaseInfo.GetDescription();
-            App.Current.Dispatcher.Invoke(() =>
-            {
-                getRelated();
-            });
+            TemplateReleaseText = Visibility.Collapsed;
+            Invoked(() => getRelated());
             
 
 #pragma warning disable CS4014
             Task.Run(() =>
             {
-                App.Current.Dispatcher.Invoke((System.Action)delegate
-                {
-                    setPoster(releaseInfo.GetPoster());
-                });
+                Invoked(() => setPoster(releaseInfo.GetPoster()));
             });
+            Task.Run(() => getVoices());
+            Task.Run(() =>addScreenshots());
             Task.Run(() =>
             {
-                App.Current.Dispatcher.Invoke((System.Action)delegate
-                {
-                    getVoices();
-                });
-            });
-            Task.Run(() =>
-            {
-                App.Current.Dispatcher.Invoke((System.Action)delegate
-                {
-                    addScreenshots();
-                });
-            });
-            Task.Run(() =>
-            {
-                App.Current.Dispatcher.Invoke((System.Action)delegate
-                {
-                    getGrades();
-                });
+                Invoked(() =>getGrades());
             });
 
 #pragma warning restore CS4014
@@ -467,11 +488,11 @@ namespace testWpf.MVVM.ViewModel
 
         public async void getVoices()
         {
-            voices = await resp.GetVoice(resp.getEpisodesUrl );
+            voices = await resp.GetVoice(resp.getEpisodesUrl);
             foreach (Voice voice in voices.result)
             {
-                comboboxVoicesData.Add(voice.name);
-                
+                Invoked(() => comboboxVoicesData.Add(voice.name));
+
             }
             Console.WriteLine("END VOICES");
         }
@@ -517,8 +538,9 @@ namespace testWpf.MVVM.ViewModel
             int count = 0;
             foreach (var s in TemplatePreferens.releaseInfo.GetScreenshots())
             {
-                screenshotsViewModel.Add(new ScreenshotsViewModel(count));
+                Invoked(()=>screenshotsViewModel.Add(new ScreenshotsViewModel(count)));
                 count++;
+                
             }
             Console.WriteLine("END ADD SCREANSHOTES");
         }
@@ -552,6 +574,10 @@ namespace testWpf.MVVM.ViewModel
                 string videoUrl = await resp.GetVideoUrl(kodikUrl);
                 isPleerNeedOpen = true;
                 pleerWindow = new IntegratedPleer(videoUrl, voicesID.vID[0].id, _selectedEpisodeItem, comboboxEpisodesData);
+                //var url = "http://cloud.kodik-storage.com/useruploads/e0507793-424d-4c93-a605-f0aee3cca16c/281fdc9a21bdeebac532c582f1d79e86:2022060107/720.mp4:hls:manifest.m3u8";
+                //var youtube = new YoutubeClient();
+                //var streamManifest = await youtube.Videos.Streams.GetManifestAsync("https://www.youtube.com/watch?v=1La4QzGeaaQ");
+                //pleerWindow = new IntegratedPleer(streamManifest.Streams[1].Url, voicesID.vID[0].id, _selectedEpisodeItem, comboboxEpisodesData);
 
             }
         }
@@ -590,8 +616,17 @@ namespace testWpf.MVVM.ViewModel
                     {
                         comboboxEpisodesData.Add(pos.position.ToString());
                     }
+                    isEnabledEpisode = true;
                 }
             }
+        }
+
+        public void Invoked(Action action)
+        {
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                action();
+            });
         }
 
         public void OnPropertyChanged(string name)
