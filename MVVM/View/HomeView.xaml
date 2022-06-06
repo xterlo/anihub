@@ -7,23 +7,123 @@
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:viewModel="clr-namespace:testWpf.MVVM.ViewModel"
              xmlns:local="clr-namespace:testWpf.MVVM.View" 
-             xmlns:core="clr-namespace:testWpf.Core"
+             xmlns:converters="clr-namespace:testWpf.MVVM.Converters"
+             xmlns:core="clr-namespace:testWpf.Core" d:DataContext="{d:DesignInstance Type=viewModel:HomeViewModel}"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" Background="Blue">
+             d:DesignHeight="1000" d:DesignWidth="1000">
     <UserControl.Resources>
-        <viewModel:ReleaseViewModel x:Key="ReleaseViewContent"/>
+        <viewModel:HomeViewModel x:Key="HomeViewContent"/>
     </UserControl.Resources>
+    <ScrollViewer
+        VerticalScrollBarVisibility="Hidden">
 
-    <Grid>
-        <StackPanel Background="Purple">
-            <TextBlock 
-                Margin="5,10,0,0"
-                FontSize="32"
-                Foreground="White"
-                FontFamily="/Fonts/#Monolog"
-                Text="{Binding title}">
-            </TextBlock>
-            <StackPanel 
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="Loaded">
+                <i:InvokeCommandAction Command="{Binding loadedFunction}" />
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
+        <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height=".2*"/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+            <Grid.Resources>
+                <converters:hotReleasesHeight x:Key="hotReleasesHeight"/>
+            </Grid.Resources>
+        <Grid
+            VerticalAlignment="Top"
+            Height="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth , Converter={StaticResource hotReleasesHeight}}"
+            Grid.Row="1"
+            Margin="25"
+            Background="{StaticResource backgroundColor}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="25"/>
+                <ColumnDefinition Width=".5*"/>
+            </Grid.ColumnDefinitions>
+                <Border
+                Background="Transparent">
+                    <Border.Resources>
+                            <converters:videoViewSize x:Key="videoViewSize"/>
+                            <converters:borderVideoViewWidth x:Key="borderVideoViewWidth"/>
+                            <converters:borderVideoViewHeight x:Key="borderVideoViewHeight"/>
+                    </Border.Resources>
+                    <Grid
+                        Width="{Binding ElementName=showcaseHotReleases, Path=Height, Converter={StaticResource videoViewSize}}">
+                        <UserControl
+                            Panel.ZIndex="-100000"
+                            Margin="15"
+                            Opacity=".3"
+                            x:Name="contentVideo"
+                            
+                            Content="{Binding VideoView}">
+                        </UserControl>
+                        <Border
+                            Background="Transparent"
+                            Width="{Binding ElementName=contentVideo, Path=Width, Converter={StaticResource borderVideoViewWidth}}"
+                            Height="{Binding ElementName=contentVideo, Path=Height, Converter={StaticResource borderVideoViewHeight}}"
+                            BorderThickness="20"
+                            CornerRadius="25"
+                            BorderBrush="{StaticResource backgroundColor}"></Border>
+                        <Grid
+                            Margin="50 20 0 0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition Height=".4*"/>
+                            </Grid.RowDefinitions>
+                        <TextBlock 
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Bottom"
+                            Text="AHSGDUADK"
+                            FontFamily="/Fonts/#Monolog"
+                            FontSize="45"
+                            Foreground="{StaticResource primaryTextColor}"/>
+                        <TextBlock
+                            Grid.Row="1"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            FontFamily="/Fonts/#Monolog"
+                            Text="AHSGDUADK" 
+                            FontSize="20"
+                            Foreground="{StaticResource secondaryTextColor}"/>
+
+                        </Grid>
+                    </Grid>
+                </Border>
+
+            <Slider Grid.Column="1"
+                    Orientation="Vertical"
+                    HorizontalAlignment="Center">
+                
+            </Slider>
+
+            <StackPanel
+                x:Name="showcaseHotReleases"
+                Grid.Column="2"
+                Margin="15">
+                <StackPanel.Resources>
+                    <Style TargetType="{x:Type Grid}">
+                        <Setter Property="Width" Value="330"></Setter>
+                        <Setter Property="Margin" Value="0,5,0,0"></Setter>
+                        </Style>
+                </StackPanel.Resources>
+                <ItemsControl 
+                     ItemsSource="{Binding hotReleaseModel}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel
+                                Orientation="Vertical"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <local:hotRelease/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+            <!--<StackPanel 
                 Orientation="Horizontal">
                 <Grid 
                     UIElement.MouseLeftButtonDown="PickSerialAsync"
@@ -46,7 +146,7 @@
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
                                 <ei:CallMethodAction MethodName="changeTitle" TargetObject="{Binding}" />
-                                <!--<ei:CallMethodAction MethodName="EventHandlerLikeMethod" TargetObject="{Binding}" />-->
+                                --><!--<ei:CallMethodAction MethodName="EventHandlerLikeMethod" TargetObject="{Binding}" />--><!--
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                         
@@ -55,9 +155,80 @@
                 </Grid>
 
 
-            </StackPanel>
+            </StackPanel>-->
 
-        </StackPanel>
-    </Grid>
-    
+        </Grid>
+            <Grid
+                Margin="45"
+                Grid.Row="2"
+                Background="Transparent">
+                <ScrollViewer
+                            x:Name="ScrollViewerRelated"
+                            CanContentScroll="False"
+                            VerticalScrollBarVisibility="Disabled"
+                            HorizontalScrollBarVisibility="Hidden"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left"
+                            Margin="0,30,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel
+                                    x:Name="showcaseRelatedReleases"
+                                    Grid.Column="1" Orientation="Horizontal">
+                            <StackPanel.Resources>
+                                <Style TargetType="{x:Type Grid}">
+                                    <Setter Property="Width" Value="200"></Setter>
+                                    <Setter Property="Height" Value="350"></Setter>
+                                    <Setter Property="Margin" Value="0,0,20,0"></Setter>
+                                </Style>
+                            </StackPanel.Resources>
+                            <ItemsControl 
+                                        ItemsSource="{Binding ongoingsReleaseModel}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel
+                                            Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <local:RelatedRelease/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
+                <Canvas
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Right"
+                            Height="auto"
+                            Width="auto">
+                    <Ellipse 
+                                x:Name="scrollToLeftButton"
+                                Canvas.Left="80"
+                                Width="50" 
+                                Height="50"
+                                Fill="#fc2c5e"/>
+                </Canvas>
+                <Canvas
+                             VerticalAlignment="Center"
+                             HorizontalAlignment="Left"
+                             Height="auto"
+                             Width="auto">
+                    <Ellipse 
+                                    x:Name="scrollToRightButton"
+                                    Canvas.Left="-80"
+                                    Width="50" 
+                                    Height="50"
+                                    Fill="#fc2c5e"/>
+                </Canvas>
+            </Grid>
+
+        </Grid>
+    </ScrollViewer>
 </UserControl>

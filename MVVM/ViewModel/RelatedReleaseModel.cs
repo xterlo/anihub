@@ -130,18 +130,35 @@ namespace testWpf.MVVM.ViewModel
 
         public RelatedReleaseModel(RelatedReleases.RelatedContent related)
         {
-            title_ru = related.title_ru;
-            year = related.year;
-            //imageSourceLink = related.poster;
-            setPoster($@"https://static.anixart.tv/posters/{related.poster}.jpg");
-            id = related.id;
             _timer.Interval = TimeSpan.FromMilliseconds(20);
             _timer.Tick += (sender, args) =>
             {
                 AnimateTemplates();
             };
             _timer.Start();
+            title_ru = related.title_ru;
+            year = related.year;
+            //imageSourceLink = related.poster;
+            setPoster($@"https://static.anixart.tv/posters/{related.poster}.jpg");
+            id = related.id;
+
         }
+        public RelatedReleaseModel(ShikiAnimeInformation.AnimeInfo anime)
+        {
+            _timer.Interval = TimeSpan.FromMilliseconds(20);
+            _timer.Tick += (sender, args) =>
+            {
+                AnimateTemplates();
+            };
+            _timer.Start();
+            title_ru = anime.russian;
+            year = anime.aired_on.Split('-')[0];
+            //imageSourceLink = related.poster;
+            setPoster($@"https://shikimori.one/{anime.image.preview}");
+            id = anime.id.ToString();
+
+        }
+
 
         public void AnimateTemplates()
         {
@@ -156,7 +173,7 @@ namespace testWpf.MVVM.ViewModel
             LGB.GradientStops.Add(new GradientStop(Color.FromArgb(255, 34, 34, 42), pos));
             AnimateTemplate = LGB;
             stepLinearGradient += 1;
-            Console.WriteLine("ANIMATE");
+            
         }
 
         public void OnPropertyChanged(string name)

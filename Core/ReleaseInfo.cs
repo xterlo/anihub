@@ -71,6 +71,110 @@ namespace testWpf.Core
 
     #endregion
 
+    #region SHIKIMORI
+
+    public class animesPopularity
+    {
+        
+        public List<anime> animes { get; set; }
+        
+        public class anime
+        {
+            [JsonProperty("url")]
+            public string url { get; set;}
+
+            [JsonProperty("name")]
+            public string name { get; set; }
+
+            [JsonProperty("russian")]
+            public string russian { get; set; }
+
+            [JsonProperty("image")]
+            public images image { get; set; }
+
+
+        }
+
+        public class images
+        {
+            [JsonProperty("original")]
+            public string original { get; set; }
+
+            [JsonProperty("preview")]
+            public string preview { get; set; }
+
+            [JsonProperty("x96")]
+            public string x96 { get; set; }
+
+            [JsonProperty("x48")]
+            public string x48 { get; set; }
+        }
+
+    }
+
+    public class ShikiAnimeInformation
+    {
+        public List<AnimeInfo> anime { get; set; }
+
+        public class AnimeInfo
+        {
+            [JsonProperty("id")]
+            public int id { get; set; }
+
+            [JsonProperty("name")]
+            public string name { get; set; }
+
+            [JsonProperty("russian")]
+            public string russian { get; set; }
+
+            [JsonProperty("url")]
+            public string url { get; set; }
+
+            [JsonProperty("kind")]
+            public string kind { get; set; }
+
+            [JsonProperty("score")]
+            public string score { get; set; }
+
+            [JsonProperty("status")]
+            public string status { get; set; }
+
+            [JsonProperty("episodes")]
+            public string episodes { get; set; }
+
+            [JsonProperty("episodes_aired")]
+            public string episodes_aired { get; set; }
+
+            [JsonProperty("aired_on")]
+            public string aired_on { get; set; }
+
+            [JsonProperty("released_on")]
+            public string released_on { get; set; }
+
+            [JsonProperty("image")]
+            public Images image { get; set; }
+
+
+
+            public class Images
+            {
+                [JsonProperty("original")]
+                public string original { get; set; }
+
+                [JsonProperty("preview")]
+                public string preview { get; set; }
+
+                [JsonProperty("x96")]
+                public string x96 { get; set; }
+
+                [JsonProperty("x48")]
+                public string x48 { get; set; }
+            }
+        }
+    }
+
+    #endregion
+
     public class Query
     {
         public string query;

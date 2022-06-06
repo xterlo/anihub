@@ -52,7 +52,7 @@ namespace testWpf.Core
                     return await reader.ReadToEndAsync();
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return "ServerError";
             }
@@ -75,6 +75,15 @@ namespace testWpf.Core
                 return false;
             }
         }
+
+        public async Task<List<ShikiAnimeInformation.AnimeInfo>> getHotAnimes(int limit)
+        {
+            string url = $"https://shikimori.one/api/animes?order=popularity&season=2022&limit={limit.ToString()}&status=ongoing";
+            string response = await GetResponseAsync(url);
+
+            return JsonConvert.DeserializeObject<List<ShikiAnimeInformation.AnimeInfo>>(response);
+        }
+        
 
         public async Task<string> CheckRoomExist(string roomid)
         {
